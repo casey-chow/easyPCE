@@ -1,7 +1,14 @@
 # Django settings for myapp project.
 
 import os
-DEBUG = True
+import sys
+import memcache
+
+if len(sys.argv) > 1:
+    DEBUG = (sys.argv[1] == 'runserver')
+else:
+    DEBUG = False
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -24,8 +31,13 @@ DATABASES = {
         'TEST_CHARSET':'utf8',
     }
 }
-# Default cache hold is 1 month
-CACHE_BACKEND = 'file:///var/tmp/django_cache/?timeout=2592000&max_entries=10'
+# Memcached cache
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211'
+    }
+}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -59,7 +71,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = '/srv/www/myapp/templates/'
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), '../templates/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -70,7 +82,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = '/srv/www/myapp/myapp/static/'
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), '/static/')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -78,7 +90,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (	
-    '/srv/www/myapp/templates/',
+    os.path.join(os.path.dirname(__file__), '../templates/'),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -139,7 +151,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'myapp', 
     'pce',
-    'django_evolution',
+#    'django_evolution',
     #'profiler',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
