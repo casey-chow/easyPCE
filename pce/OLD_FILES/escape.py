@@ -11,10 +11,10 @@ import HTMLParser
 hp = HTMLParser.HTMLParser()
 
 needfix = Course.objects.filter(title__icontains="&")
-#for i in needfix:
+# for i in needfix:
 #	print hp.unescape(i.title)
 
-#print hp.unescape("<i>hi</i>")
+# print hp.unescape("<i>hi</i>")
 s = "<i>a</i>"
 pattern = re.compile(r'<.*?>')
 print pattern.sub('', s)

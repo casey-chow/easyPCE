@@ -10,7 +10,7 @@ import json
 import os
 import re
 import StringIO
-#import nltk                                                                                         
+#import nltk
 import operator
 import sys
 sys.path.append('/srv/www/easypce/')
@@ -21,12 +21,12 @@ from models import *
 
 coursenums = CourseNum.objects.all()
 for c in coursenums:
-#    print "trying coursenum:"
-#    print c
-#    if c.avg:
-#        print "average exists"
-#        print c.avg
-#    print "trying to save:"
+    #    print "trying coursenum:"
+    #    print c
+    #    if c.avg:
+    #        print "average exists"
+    #        print c.avg
+    #    print "trying to save:"
     c.save()
 #    print "avg is now:"
     if c.avg:

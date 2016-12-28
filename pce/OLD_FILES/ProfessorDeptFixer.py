@@ -37,8 +37,3 @@ for i, p in enumerate(profs):
         continue
 
     print""
-    
-            
-            
-            
-    

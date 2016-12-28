@@ -7,7 +7,7 @@ if len(sys.argv) > 1:
 else:
     DEBUG = False
 
-DEBUG = True #TODO: Remove.
+DEBUG = True  # TODO: Remove.
 TEMPLATE_DEBUG = DEBUG
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -20,14 +20,18 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'PCE_2',                      # Or path to database file if using sqlite3.
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.mysql',
+        # Or path to database file if using sqlite3.
+        'NAME': 'PCE_2',
         # The following settings are not used with sqlite3:
         'USER': 'root',
         'PASSWORD': 'dolphin',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        # Empty for localhost through domain sockets or '127.0.0.1' for
+        # localhost through TCP.
+        'HOST': '',
         'PORT': '',                      # Set to empty string for default.
-        'TEST_CHARSET':'utf8',
+        'TEST_CHARSET': 'utf8',
     }
 }
 # Memcached cache
@@ -50,8 +54,8 @@ ALLOWED_HOSTS = [
 ]
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-   'django.core.context_processors.static',
-   'django.contrib.auth.context_processors.auth'
+    'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth'
 )
 
 # Local time zone for this installation. Choices can be found here:
@@ -97,7 +101,7 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Additional locations of static files
-STATICFILES_DIRS = (    
+STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
     os.path.join(os.path.dirname(__file__), '../templates/'),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -110,7 +114,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -119,11 +123,11 @@ SECRET_KEY = '=3vdm=xv9io=b&$biy7+6)3ri9!l0z&-w(ly1z3!1(ntizm&_v'
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     ('django.template.loaders.cached.Loader', (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
      'django.template.loaders.eggs.Loader',
-    )),
-#	'django.template.loader'
+     )),
+    #	'django.template.loader'
 )
 
 
@@ -135,7 +139,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-#    'profiler.middleware.ProfilerMiddleware',
+    #    'profiler.middleware.ProfilerMiddleware',
 )
 
 ROOT_URLCONF = 'easypce.urls'
@@ -158,9 +162,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'easypce', 
+    'easypce',
     'pce',
-#    'django_evolution',
+    #    'django_evolution',
     #'profiler',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',

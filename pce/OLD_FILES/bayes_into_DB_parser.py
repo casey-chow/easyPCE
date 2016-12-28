@@ -8,6 +8,7 @@ from models import *
 
 FILE_NAME = 'ratings_final'
 
+
 def insertBayes():
     f = open(FILE_NAME)
     for l in f:
@@ -17,7 +18,7 @@ def insertBayes():
             cn = CourseNum.objects.get(dept=d, number=fields[1])
             print l
             print cn
-            cn.bayes=float(fields[2])
+            cn.bayes = float(fields[2])
             cn.save()
         except Department.DoesNotExist:
             print "Dept does not exist"
@@ -25,9 +26,6 @@ def insertBayes():
         except CourseNum.DoesNotExist:
             print "CourseNum does not exist"
             continue
-
-                                   
-
 
 
 insertBayes()

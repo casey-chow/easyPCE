@@ -19,37 +19,43 @@ from models import *
 # By Candy Button, Fall 2012 Independent Work with Brian Kernighan
 
 # Using the Natural Language Toolkit:
-# Bird, Steven, Edward Loper and Ewan Klein (2009). Natural Language Processing with Python. O'Reilly Media Inc.
-
+# Bird, Steven, Edward Loper and Ewan Klein (2009). Natural Language
+# Processing with Python. O'Reilly Media Inc.
 
 
 def v(text):
     if Parser.VERBOSE:
-        print text;
+        print text
+
 
 def readfile(filename):
-    contents = None;
+    contents = None
     with open(filename, 'r') as f:
         contents = f.read()
     return contents
+
 
 def soupfile(filename):
     html = readfile(filename)
     return BeautifulSoup(html)
 
+
 def isdatafile(filename):
     # TODO
     return not isadvicefile(filename)
+
 
 def isadvicefile(filename):
     soup = soupfile(filename)
     tag = soup.find(name="ul")
     return (tag is not None)
 
+
 def coursenum_from_filename(filename):
     match = re.search("^.*_", filename)
     coursenum = match.group(0)[0:-1]
     return coursenum
+
 
 def coursedept_from_filename(filename):
     split = filename.split("/")
@@ -59,6 +65,7 @@ def coursedept_from_filename(filename):
     else:
         return name[:3]
 
+
 class Parser:
 
     SAVE_FILE = "state_of_parser.json"
@@ -66,7 +73,7 @@ class Parser:
 
     def __init__(self):
         self.data = {}
-        self.worddict={}
+        self.worddict = {}
 
     def nextfilename(self):
         pass
@@ -74,9 +81,9 @@ class Parser:
     def load(self):
         try:
             f = open(Parser.SAVE_FILE, 'r')
-            if f == None:
+            if f is None:
                 return False
-            self.data = json.load(f);
+            self.data = json.load(f)
             f.close()
             v("******** LOADED DATA *******\n")
             return True
@@ -89,25 +96,25 @@ class Parser:
         json.dump(self.data, f)
         f.close()
 
-    # This function requires the natural language toolkit - you must download it and 
+    # This function requires the natural language toolkit - you must download it and
     # uncomment the import statement (import nltk) at the top of this file
     def parse_words(self, sentences):
         words = nltk.word_tokenize(sentences)
         tags = nltk.pos_tag(words)
-        
+
         for tag in tags:
             if tag[1] == 'JJ':
-                word = tag[0];
-                if self.worddict.get(word) == None:
-                    self.worddict[word] = 1;
+                word = tag[0]
+                if self.worddict.get(word) is None:
+                    self.worddict[word] = 1
                 else:
-                    self.worddict[word] += 1;
+                    self.worddict[word] += 1
 
     def parse_advice(self, filename):
         #coursenum = coursenum_from_filename(filename);
         soup = soupfile(filename)
         tag = soup.find(name="ul")
-        if tag == None:
+        if tag is None:
             print "Couldn't find advice list for ", coursenum
             return False
         for item in tag.children:
@@ -115,14 +122,14 @@ class Parser:
                 # Save the data in the Parser object
                 # if self.data.get(filename) == None:
                 #    self.data[filename] = []
-                # self.data[filename].append(item.string.strip()) 
+                # self.data[filename].append(item.string.strip())
 
                 # Or parse individual words from the string
-                # self.parse_words(item.string.strip()); 
+                # self.parse_words(item.string.strip());
 
                 # Print the string if in verbose mode
                 print item.string.strip()
-                #advicelists.append(advicelist)
+                # advicelists.append(advicelist)
                 # INSERT YOUR CODE HERE,
                 # use item.string.strip() as a single student's advice
         return True
@@ -145,7 +152,7 @@ class Parser:
     def parse_dir(self):
         # "." means the current directory
 
-#        files = filter(os.path.isfile, os.listdir('../../../curling/database_Load_Test'))
+        #        files = filter(os.path.isfile, os.listdir('../../../curling/database_Load_Test'))
         path = '/home/ubuntu/curling/database_Load_Test/'
         files = os.listdir(path)
         for i, file in enumerate(files):
@@ -159,7 +166,7 @@ class Parser:
         for file in itertools.ifilter(isdatafile, files):
             v(file)
             self.parse_numbers(file)
-        #v(self.data)
+        # v(self.data)
 
     def print_words(self):
         list = sorted(self.worddict.iteritems(), key=operator.itemgetter(1))
@@ -167,21 +174,24 @@ class Parser:
             print "%s: %d" % tuple
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-v", "--verbose", help="print out lots of junk for debugging", action="store_true")
+parser.add_argument(
+    "-v",
+    "--verbose",
+    help="print out lots of junk for debugging",
+    action="store_true")
 args = parser.parse_args()
 Parser.VERBOSE = args.verbose
 
-p = Parser();
+p = Parser()
 try:
-    # Loading and saving don't do anything unless you store stuff in the parser's data field, 
+    # Loading and saving don't do anything unless you store stuff in the parser's data field,
     # and the parsing function ignores the loaded data, so there's no use in saving/loading here.
     # p.load();
 
-    p.parse_dir();
+    p.parse_dir()
     # Only if you've saved words in the parser's worddict...
     # p.print_words();
     # p.save();
-except Exception, e: 
+except Exception as e:
     z = e
     print z
-

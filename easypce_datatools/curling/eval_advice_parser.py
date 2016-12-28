@@ -19,39 +19,45 @@ from pce.models import *
 # By Candy Button, Fall 2012 Independent Work with Brian Kernighan
 
 # Using the Natural Language Toolkit:
-# Bird, Steven, Edward Loper and Ewan Klein (2009). Natural Language Processing with Python. O'Reilly Media Inc.
-
+# Bird, Steven, Edward Loper and Ewan Klein (2009). Natural Language
+# Processing with Python. O'Reilly Media Inc.
 
 
 def v(text):
     if Parser.VERBOSE:
-        print text;
+        print text
+
 
 def readfile(filename):
-    contents = None;
+    contents = None
     with open(filename, 'r') as f:
         contents = f.read()
     return contents
+
 
 def soupfile(filename):
     html = readfile(filename)
     return BeautifulSoup(html)
 
+
 def isdatafile(filename):
     # TODO
     return not isadvicefile(filename)
+
 
 def isadvicefile(filename):
     soup = soupfile(filename)
     tag = soup.find(name="ul")
     return (tag is not None)
 
+
 def coursenum_from_filename(filename):
     filename = filename.split("/")[-1].split("_")[0]
-    
+
     coursenum = filename[3:]
     print coursenum
     return coursenum
+
 
 def coursedept_from_filename(filename):
     split = filename.split("/")
@@ -61,6 +67,7 @@ def coursedept_from_filename(filename):
     else:
         return name[:3]
 
+
 class Parser:
 
     SAVE_FILE = "state_of_parser.json"
@@ -68,7 +75,7 @@ class Parser:
 
     def __init__(self):
         self.data = {}
-        self.worddict={}
+        self.worddict = {}
 
     def nextfilename(self):
         pass
@@ -76,9 +83,9 @@ class Parser:
     def load(self):
         try:
             f = open(Parser.SAVE_FILE, 'r')
-            if f == None:
+            if f is None:
                 return False
-            self.data = json.load(f);
+            self.data = json.load(f)
             f.close()
             v("******** LOADED DATA *******\n")
             return True
@@ -91,19 +98,19 @@ class Parser:
         json.dump(self.data, f)
         f.close()
 
-    # This function requires the natural language toolkit - you must download it and 
+    # This function requires the natural language toolkit - you must download it and
     # uncomment the import statement (import nltk) at the top of this file
     def parse_words(self, sentences):
         words = nltk.word_tokenize(sentences)
         tags = nltk.pos_tag(words)
-        
+
         for tag in tags:
             if tag[1] == 'JJ':
-                word = tag[0];
-                if self.worddict.get(word) == None:
-                    self.worddict[word] = 1;
+                word = tag[0]
+                if self.worddict.get(word) is None:
+                    self.worddict[word] = 1
                 else:
-                    self.worddict[word] += 1;
+                    self.worddict[word] += 1
 
     def getCourse(self, filename, isadvicefile):
         print filename
@@ -121,49 +128,53 @@ class Parser:
             title = span[2]
             for x in range(3, len(span)):
                 title = title + " " + span[x]
-        #Check if department has been seen before. If not, add it to database.
+        # Check if department has been seen before. If not, add it to database.
         try:
             d = Department.objects.get(dept=coursedept_from_filename(filename))
         except Exception as inst:
-            sys.stderr.write("department failed for %s %s\n\n" % (type(inst), inst))
+            sys.stderr.write(
+                "department failed for %s %s\n\n" %
+                (type(inst), inst))
             #sys.stderr.write("department fialed for %s\n" % (coursedept_from_filename(filename)))
             return None
-    
+
         # Get course. Add if not already in database.
         try:
             course = Course.objects.get(
                 coursenum__dept=d,
                 coursenum__number=coursenum_from_filename(filename),
-                semester=semester, 
+                semester=semester,
                 year=year)
-            #if courses.count()==0:
-                #sys.stderr.write("cnum failed for %s %s\n" % (d.dept, coursenum_from_filename(filename)))
-                #return None
+            # if courses.count()==0:
+            #sys.stderr.write("cnum failed for %s %s\n" % (d.dept, coursenum_from_filename(filename)))
+            # return None
         except Exception as inst:
-            sys.stderr.write("course exception: %s %s\n\n" % (type(inst), inst))
+            sys.stderr.write(
+                "course exception: %s %s\n\n" %
+                (type(inst), inst))
             #sys.stderr.write("for %s %s\n" % (d.dept, coursenum_from_filename(filename)))
             return None
 
-        #try:
+        # try:
         #    c = courses.get(
         #        semester=semester,
         #        year=year)
-        #except Exception as inst:
+        # except Exception as inst:
         #    sys.stderr.write("course exception: %s %s\n" % (type(inst), inst))
         #    sys.stderr.write("for %s %s %s %s\n" % (semester, year, d, coursenum_from_filename(filename)))
         #    return None
 
-        print "Got course"    
+        print "Got course"
         return course
 
     def parse_advice(self, filename):
         soup = soupfile(filename)
         c = self.getCourse(filename, True)
-        if c == None:
+        if c is None:
             return False
 
         tag = soup.find(name="ul")
-        if tag == None:
+        if tag is None:
             print "Couldn't find advice list for ", coursenum
             return False
 
@@ -172,20 +183,21 @@ class Parser:
                 # Save the data in the Parser object
                 # if self.data.get(filename) == None:
                 #    self.data[filename] = []
-                # self.data[filename].append(item.string.strip()) 
+                # self.data[filename].append(item.string.strip())
 
                 # Or parse individual words from the string
-                # self.parse_words(item.string.strip()); 
+                # self.parse_words(item.string.strip());
 
                 # Print the string if in verbose mode
 
-                #advicelists.append(advicelist)
+                # advicelists.append(advicelist)
                 # INSERT YOUR CODE HERE,
                 # use item.string.strip() as a single student's advice
                 try:
                     t = item.string.strip()
                     try:
-                        exists = Advice.objects.get(instance=c, text=unicode(t))
+                        exists = Advice.objects.get(
+                            instance=c, text=unicode(t))
                     except Advice.DoesNotExist:
                         a = Advice(
                             instance=c,
@@ -201,7 +213,7 @@ class Parser:
         #coursenum = coursenum_from_filename(filename);
         #table = soup.find(name="table")
         # TODO: fill out the rest of the BeautifulSoup parsing to get the data here
-        # INSERT YOUR CODE HERE      
+        # INSERT YOUR CODE HERE
         v("trying to parse numbers")
         c = self.getCourse(filename, False)
         if c is None:
@@ -211,7 +223,7 @@ class Parser:
 
         # Add evluation for course
         for s in soup('td', width="50%"):
-            #print s.string
+            # print s.string
             try:
                 p = s.findNextSiblings(limit=9)
                 qt = s.string
@@ -247,11 +259,11 @@ class Parser:
                 e.save()
                 print "Evaluation saved"
             except Exception as inst:
-            	sys.stderr.write("Failed adding evaluation for %s\n" % c)
+                sys.stderr.write("Failed adding evaluation for %s\n" % c)
                 sys.stderr.write("Exception: %s %s" % (type(inst), inst))
-            	return False
-		
-		return True
+                return False
+
+                return True
 
     def parse_dir(self):
         # "." means the current directory
@@ -271,7 +283,7 @@ class Parser:
         for file in itertools.ifilter(isdatafile, files):
             v(file)
             self.parse_numbers(file)
-        #v(self.data)
+        # v(self.data)
 
     def print_words(self):
         list = sorted(self.worddict.iteritems(), key=operator.itemgetter(1))
@@ -279,19 +291,23 @@ class Parser:
             print "%s: %d" % tuple
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-v", "--verbose", help="print out lots of junk for debugging", action="store_true")
+parser.add_argument(
+    "-v",
+    "--verbose",
+    help="print out lots of junk for debugging",
+    action="store_true")
 args = parser.parse_args()
 Parser.VERBOSE = args.verbose
 
-p = Parser();
+p = Parser()
 try:
-    # Loading and saving don't do anything unless you store stuff in the parser's data field, 
+    # Loading and saving don't do anything unless you store stuff in the parser's data field,
     # and the parsing function ignores the loaded data, so there's no use in saving/loading here.
     # p.load();
-    p.parse_dir();
+    p.parse_dir()
     # Only if you've saved words in the parser's worddict...
     # p.print_words();
     # p.save();
-except Exception, e: 
+except Exception as e:
     z = e
     print z

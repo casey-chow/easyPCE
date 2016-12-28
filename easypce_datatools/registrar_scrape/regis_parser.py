@@ -14,12 +14,13 @@ DIR_PATH = '/srv/www/easypce/easypce_datatools/registrar_scrape/DATA/DATA_FALL_2
 VERBOSE = True
 FILECOUNT = 0
 
+
 def v(data):
     if VERBOSE:
         print data
 
-class Parser:
 
+class Parser:
 
     SAVE_FILE = "state_of_parser.json"
 
@@ -29,7 +30,7 @@ class Parser:
 
     def save(self):
         f = open(Parser.SAVE_FILE, 'w')
-        if f == None:
+        if f is None:
             v("Can't create/open file for saving state")
             return False
         json.dump(self.state, f)
@@ -39,7 +40,7 @@ class Parser:
     def load(self):
         try:
             f = open(Parser.SAVE_FILE, 'r')
-            if f == None:
+            if f is None:
                 v("Can't open file")
                 return False
             self.state = json.load(f)
@@ -48,7 +49,6 @@ class Parser:
             return True
         except IOError:
             return False
-    
 
     def saveCourse(self, filename):
 
@@ -81,35 +81,37 @@ class Parser:
         cnums = []
         newcnums = []
         for listing in info['listings']:
-             #see if coursenum in db, probably isn't ???                                            
+             # see if coursenum in db, probably isn't ???
             try:
-                cn = CourseNum.objects.get(dept=Department.objects.get(dept=listing['dept']),
-                                           number=listing['number'])
+                cn = CourseNum.objects.get(
+                    dept=Department.objects.get(
+                        dept=listing['dept']),
+                    number=listing['number'])
                 if cn:
                     cnums.append(cn)
                     continue
             except CourseNum.DoesNotExist:
-                newcn = CourseNum(dept=Department.objects.get(dept=listing['dept']),
-                                  number=listing['number'])
+                newcn = CourseNum(
+                    dept=Department.objects.get(
+                        dept=listing['dept']),
+                    number=listing['number'])
                 newcnums.append(newcn)
                 newcn.save()
 
-
-        
         try:
             course = Course.objects.get(title=info['title'],
-                           regNum=info['courseid'],
-                           description=info['descrip'],
-                           semester=sem,
-                           year=year)
+                                        regNum=info['courseid'],
+                                        description=info['descrip'],
+                                        semester=sem,
+                                        year=year)
             print "Course already exists"
             return
         except Course.DoesNotExist:
             ourcourse = Course(title=info['title'],
-                           regNum=info['courseid'],
-                           description=info['descrip'],
-                           semester=sem,
-                           year=year)
+                               regNum=info['courseid'],
+                               description=info['descrip'],
+                               semester=sem,
+                               year=year)
             ourcourse.save()
             global FILECOUNT
             FILECOUNT = FILECOUNT + 1
@@ -119,13 +121,12 @@ class Parser:
                 cn.instance.add(ourcourse)
             for cn in newcnums:
                 cn.instance.add(ourcourse)
-        
-    
+
         pidb = []
         pnotidb = []
 
         for prof in info['profs']:
-            #see if profs in database
+            # see if profs in database
             first = ""
             try:
                 names = prof['name'].split()
@@ -141,54 +142,56 @@ class Parser:
                 else:
                     first = names[0]
                     last = names[1]
-                pro  = Professor.objects.get(firstname=first.replace(",",""),
-                                             lastname=last.replace(",",""))
+                pro = Professor.objects.get(firstname=first.replace(",", ""),
+                                            lastname=last.replace(",", ""))
                 if pro:
                     pidb.append(pro)
             except Professor.DoesNotExist:
                 yo = [first, last]
                 pnotidb.append(yo)
-        
+
         for prof in pnotidb:
 
-            #add ones not in db to db
-            p = Professor(firstname=prof[0].replace(",",""), lastname=prof[1].replace(",",""))
+            # add ones not in db to db
+            p = Professor(
+                firstname=prof[0].replace(
+                    ",", ""), lastname=prof[1].replace(
+                    ",", ""))
             p.save()
             ourcourse.profs.add(p)
             for listing in info['listings']:
                 p.depts.add(Department.objects.get(dept=listing['dept']))
-                
-        #add depts to profs who need it
-        for prof in pidb:    
+
+        # add depts to profs who need it
+        for prof in pidb:
             ourcourse.profs.add(prof)
             for listing in info['listings']:
                 departs = prof.depts.filter(dept=listing['dept'])
                 if not departs:
                     continue
                 else:
-                    prof.depts.add(Department.objects.get(dept=listing['dept']))
-                        
+                    prof.depts.add(
+                        Department.objects.get(
+                            dept=listing['dept']))
 
-
-        #for prof in info['profs']:
+        # for prof in info['profs']:
         #    print prof['name']
-        #print info['title']
-        #print info['courseid']
-        #for listing in info['listings']:
+        # print info['title']
+        # print info['courseid']
+        # for listing in info['listings']:
         #    print listing['dept'], listing['number']
-        #print info['descrip']
-        #print info['classnum'] buried on layer deeper at classes
-
+        # print info['descrip']
+        # print info['classnum'] buried on layer deeper at classes
 
     def skipAhead(self, files):
         if len(self.state) != 0:
-            foundPlace = False;
+            foundPlace = False
             newfiles = []
             for file in files:
                 if foundPlace:
                     newfiles.extend(file)
                 if file is self.state:
-                    foundPlace = True;
+                    foundPlace = True
             return newfiles
         else:
             return files
@@ -206,7 +209,7 @@ class Parser:
             v("Operating on file:" + file + '\n')
             self.saveCourse(file)
             self.state = file
-            #self.save()
+            # self.save()
         v("Files are all parsed.")
         return True
 

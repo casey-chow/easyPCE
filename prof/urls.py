@@ -6,14 +6,14 @@ import views
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
-    #url(r'^$', pce.views.login_page),
-    url(r'^(?P<netid>\w+)/?$', views.professor),
-    # url(r'^easypce/', include('easypce.foo.urls')),
+                       # Examples:
+                       #url(r'^$', pce.views.login_page),
+                       url(r'^(?P<netid>\w+)/?$', views.professor),
+                       # url(r'^easypce/', include('easypce.foo.urls')),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+                       # Uncomment the admin/doc line below to enable admin documentation:
+                       # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
-)
+                       # Uncomment the next line to enable the admin:
+                       # url(r'^admin/', include(admin.site.urls)),
+                       )
