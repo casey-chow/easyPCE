@@ -10,6 +10,8 @@ else:
 DEBUG = True #TODO: Remove.
 TEMPLATE_DEBUG = DEBUG
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 ADMINS = (
     ('Casey Chow', 'cc22@princeton.edu')
 )
@@ -42,7 +44,7 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     '127.0.0.1',
     'localhost',
-    'easypce-test.heroku.com',
+    '.heroku.com',
     'easypce.com',
     'www.easypce.com'
 ]
@@ -76,7 +78,6 @@ USE_TZ = True
 
 # Static File Serving
 # https://devcenter.heroku.com/articles/django-assets
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
