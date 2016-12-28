@@ -37,10 +37,17 @@ CACHES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ['easypce.com', 'www.easypce.com']
+ALLOWED_HOSTS = [
+    '0.0.0.0',
+    '127.0.0.1',
+    'localhost',
+    'easypce.com',
+    'www.easypce.com'
+]
 
 TEMPLATE_CONTEXT_PROCESSORS = (
    'django.core.context_processors.static',
+   'django.contrib.auth.context_processors.auth'
 )
 
 # Local time zone for this installation. Choices can be found here:
@@ -125,10 +132,10 @@ MIDDLEWARE_CLASSES = (
 #    'profiler.middleware.ProfilerMiddleware',
 )
 
-ROOT_URLCONF = 'myapp.urls'
+ROOT_URLCONF = 'easypce.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'myapp.wsgi.application'
+WSGI_APPLICATION = 'easypce.wsgi.application'
 
 TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), '../templates'),
@@ -145,14 +152,14 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'myapp', 
+    'easypce', 
     'pce',
 #    'django_evolution',
     #'profiler',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
 )
 
 # A sample logging configuration. The only tangible logging

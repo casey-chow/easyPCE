@@ -64,7 +64,7 @@ LIST_URL = URL_PREFIX + "search_results.xml?term={term}"
 COURSE_URL = URL_PREFIX + "course_details.xml?courseid={courseid}&term={term}"
 
 # This is where the scraped HTML will be saved.
-HTML_DIRECTORY = "/srv/www/myapp/easypce_datatools/registrar_scrape/DATA/LOAD_DATA/"
+HTML_DIRECTORY = "/srv/www/easypce/easypce_datatools/registrar_scrape/DATA/LOAD_DATA/"
 
 COURSE_URL_REGEX = re.compile(r'courseid=(?P<id>\d+)')
 LISTING_REGEX = re.compile(r'(?P<dept>[A-Z]{3})\s+(?P<num>\w{2,4})')

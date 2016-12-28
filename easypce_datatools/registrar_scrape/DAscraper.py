@@ -31,9 +31,9 @@ import itertools
 import StringIO
 import operator
 
-sys.path.append('/srv/www/myapp/')
-sys.path.append('/srv/www/myapp/pce')
-from myapp import settings
+sys.path.append('/srv/www/easypce/')
+sys.path.append('/srv/www/easypce/pce')
+from easypce import settings
 from django.core.management import setup_environ
 setup_environ(settings)
 from models import *

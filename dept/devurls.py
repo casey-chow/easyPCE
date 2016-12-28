@@ -11,7 +11,7 @@ urlpatterns = patterns('',
     url(r'^(?P<dept>\w{3})/?$', devviews.dephome),
     #url(r'^(?P<dept>\w{3})/courses$', views.depcourses),
     #url(r'^(?P<dept>\w{3})/professors$', views.depprofs),
-    # url(r'^myapp/', include('myapp.foo.urls')),
+    # url(r'^easypce/', include('easypce.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

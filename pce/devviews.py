@@ -16,7 +16,7 @@ import urllib, re
 def getBayes():
 	bayes = []
 	bayesCN = []
-	f = open("/srv/www/myapp/pce/25ratings.txt", "r")
+	f = open("/srv/www/easypce/pce/25ratings.txt", "r")
 	for l in f:
 		w = l.split()
 		d = Department.objects.get(dept=w[0])

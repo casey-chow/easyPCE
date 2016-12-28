@@ -30,8 +30,8 @@ import sys
 import os
 import urllib2
 from BeautifulSoup import BeautifulSoup
-sys.path.append('/srv/www/myapp/')
-from myapp import settings
+sys.path.append('/srv/www/easypce/')
+from easypce import settings
 from django.core.management import setup_environ
 setup_environ(settings)
 from pce.models import *

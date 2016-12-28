@@ -4,13 +4,13 @@ import json
 import os
 import re
 import sys
-sys.path.append('/srv/www/myapp/')
-from myapp import settings
+sys.path.append('/srv/www/easypce/')
+from easypce import settings
 from django.core.management import setup_environ
 setup_environ(settings)
 from pce.models import *
 
-DIR_PATH = '/srv/www/myapp/easypce_datatools/registrar_scrape/DATA/DATA_FALL_2014_2015/'
+DIR_PATH = '/srv/www/easypce/easypce_datatools/registrar_scrape/DATA/DATA_FALL_2014_2015/'
 VERBOSE = True
 FILECOUNT = 0
 

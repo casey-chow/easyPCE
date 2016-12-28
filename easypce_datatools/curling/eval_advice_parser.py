@@ -10,8 +10,8 @@ import StringIO
 #import nltk
 import operator
 import sys
-sys.path.append('/srv/www/myapp/')
-from myapp import settings
+sys.path.append('/srv/www/easypce/')
+from easypce import settings
 from django.core.management import setup_environ
 setup_environ(settings)
 from pce.models import *
@@ -257,7 +257,7 @@ class Parser:
         # "." means the current directory
 
         #files = filter(os.path.isfile, os.listdir('../../../curling/database_Load_Test'))
-        path = '/srv/www/myapp/easypce_datatools/curling/DATA/DATA_2013-2014/EVAL/'
+        path = '/srv/www/easypce/easypce_datatools/curling/DATA/DATA_2013-2014/EVAL/'
         #path = '/home/ubuntu/test/'
         files = os.listdir(path)
         for i, file in enumerate(files):

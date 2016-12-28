@@ -9,7 +9,7 @@ urlpatterns = patterns('',
     # Examples:
     #url(r'^$', pce.views.login_page),
     url(r'^(?P<netid>\w+)/?$', devviews.professor),
-    # url(r'^myapp/', include('myapp.foo.urls')),
+    # url(r'^easypce/', include('easypce.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
