@@ -42,6 +42,7 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     '127.0.0.1',
     'localhost',
+    'easypce-test.heroku.com',
     'easypce.com',
     'www.easypce.com'
 ]
