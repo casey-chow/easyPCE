@@ -4,19 +4,28 @@ A better course evaluation tool.
 
 ## Installation and Running
 
-Make sure you have Python 2.7, pip and PostgreSQL installed. Then, run:
+Make sure you have Python 2.7, pip, and PostgreSQL, and npm installed. Then, run:
 
 ```sh
-pip install -r requirements/local.txt
-python manage.py migrate
-python manage.py runserver
+$ pip install -r requirements/local.txt
+$ python manage.py migrate
+$ npm install
+$ npm run build
 ```
 
-Make sure that you also have webpack running to get the client-side
-code. In another terminal:
+To run the server:
 
 ```sh
-./node_modules/.bin/webpack --config webpack.config.babel.js --watch
+$ python manage.py runserver
+```
+
+If you intend to develop on the build, you may enjoy hot code reloading on the
+client side. To set this up, run:
+
+
+```sh
+$ npm run watch &
+$ python manage.py runserver
 ```
 
 ## Thanks

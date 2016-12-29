@@ -45,7 +45,7 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     # Django Rest Framework
     'rest_framework',
-    
+
     # Enable serving of webpack bundles
     'webpack_loader',
 
@@ -251,13 +251,3 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
-
-# WEBPACK LOADER
-# ------------------------------------------------------------------------------
-
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': str(ROOT_DIR.path('webpack-stats.json')),
-    }
-}

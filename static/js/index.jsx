@@ -1,7 +1,16 @@
 import React from 'react';
+import $ from 'jquery';
 import ReactDOM from 'react-dom';
 
 class BooksList extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            data: [],
+        };
+    }
+
     componentDidMount() {
         this.loadBooksFromServer();
         setInterval(this.loadBooksFromServer, 

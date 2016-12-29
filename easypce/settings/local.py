@@ -35,10 +35,33 @@ CACHES = {
     }
 }
 
+# WEBPACK LOADER
+# ------------------------------------------------------------------------------
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'CACHE': False,
+        'STATS_FILE': str(ROOT_DIR.path('webpack-stats.json')),
+    }
+}
+
+# CORS
+# ------------------------------------------------------------------------------
+
+# allow CORS from all origins
+CORS_ORIGIN_ALLOW_ALL = True
+
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
-MIDDLEWARE += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
-INSTALLED_APPS += ('debug_toolbar', )
+MIDDLEWARE += (
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+)
+INSTALLED_APPS += (
+    'debug_toolbar',
+    'corsheaders',
+)
 
 INTERNAL_IPS = ['127.0.0.1', '10.0.2.2', ]
 # tricks to have debug toolbar when developing with docker

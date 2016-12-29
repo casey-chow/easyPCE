@@ -1,17 +1,17 @@
-import path from 'path';
-import webpack from 'webpack';
-import BundleTracker from 'webpack-bundle-tracker';
+const path = require('path');
+const webpack = require('webpack');
+const BundleTracker = require('webpack-bundle-tracker');
 
-export default {
+module.exports = {
     // the base directory (absolute path) for resolving the entry option
-    context: __dirname,
+    context: path.dirname(__dirname),
 
     // the entry point for the client-side application
     entry: './static/js/index',
 
     output: {
         // where you want your compiled bundle to be stored
-        path: path.resolve('./static/bundles/'),
+        path: path.resolve(__dirname, '../static/bundles/'),
 
         // naming convention webpack should use for outputtedfiles
         filename: '[name]-[hash].js',
