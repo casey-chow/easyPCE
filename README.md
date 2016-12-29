@@ -19,6 +19,11 @@ code. In another terminal:
 ./node_modules/.bin/webpack --config webpack.config.babel.js --watch
 ```
 
+## Thanks
+
+- [Using React with Django, with a little help from Webpack](https://geezhawk.github.io/using-react-with-django-rest-framework)
+- [Django REST Framework Tutorial](http://www.django-rest-framework.org/tutorial/1-serialization/)
+
 ---
 
 ## How to Use

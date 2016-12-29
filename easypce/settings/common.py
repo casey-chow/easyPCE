@@ -43,6 +43,9 @@ DJANGO_APPS = (
 )
 
 THIRD_PARTY_APPS = (
+    # Django Rest Framework
+    'rest_framework',
+    
     # Enable serving of webpack bundles
     'webpack_loader',
 
