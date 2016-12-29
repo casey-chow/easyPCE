@@ -1,12 +1,25 @@
-# Heroku Django Starter Template
+# easyPCE
 
-An utterly fantastic project starter template for Django 1.10.
+A better course evaluation tool.
 
-## Features
+## Installation and Running
 
-- Production-ready configuration for Static Files, Database Settings, Gunicorn, etc.
-- Enhancements to Django's static file serving functionality via WhiteNoise.
-- Latest Python 3.6 runtime environment. 
+Make sure you have Python 2.7, pip and PostgreSQL installed. Then, run:
+
+```sh
+pip install -r requirements/local.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+Make sure that you also have webpack running to get the client-side
+code. In another terminal:
+
+```sh
+./node_modules/.bin/webpack --config webpack.config.babel.js --watch
+```
+
+---
 
 ## How to Use
 
@@ -36,10 +49,6 @@ You can replace ``helloworld`` with your desired project name.
     $ heroku run python manage.py migrate
 
 See also, a [ready-made application](https://github.com/heroku/python-getting-started), ready to deploy.
-
-## Using Python 2.7?
-
-Just update `runtime.txt` to `python-2.7.13` (no trailing spaces or newlines!).
 
 ## Further Reading
 
