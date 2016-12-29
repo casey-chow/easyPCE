@@ -6,7 +6,6 @@ django==1.10.4
 # Configuration
 django-environ==0.4.1
 whitenoise==3.2.2
-dj-database-url==0.4.1
 
 # Forms
 django-braces==1.10.0
