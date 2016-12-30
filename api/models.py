@@ -4,6 +4,7 @@ maps to the OIT WebFeeds API.
 """
 from __future__ import unicode_literals
 import re
+from django.utils.timezone import now
 
 from django.db import models
 from django.core.validators import RegexValidator
@@ -222,6 +223,11 @@ class Offering(models.Model):
     )
     # Instructors
     instructors = models.ManyToManyField(Instructor)
+
+    # Timestamp, for scraping
+    last_updated = models.DateTimeField(
+        default=now,
+    )
 
     def __unicode__(self):
         return unicode(title)
