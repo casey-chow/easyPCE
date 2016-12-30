@@ -73,14 +73,14 @@ class Term(models.Model):
     )
 
     # Automatically update the season and year upon save
-    def save(self):
-        season, year = re.match(r'^(S|SU|F)(\d{4})$', self.suffix)
+    def save(self, *args, **kwargs):
+        season, year = re.match(r'^(S|SU|F)(\d{4})$', self.suffix).groups()
         self.season = season
         self.year = int(year)
-        super(Term, self).save()
+        super(Term, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return unicode(self.name, 'utf-8')
+        return self.name.decode('utf-8')
 
 
 class Subject(models.Model):
@@ -107,7 +107,7 @@ class Subject(models.Model):
     )
 
     def __unicode__(self):
-        return unicode(self.name)
+        return self.name.decode('utf-8')
 
 
 class Course(models.Model):
@@ -340,4 +340,4 @@ class User(models.Model):
     )
 
     def __unicode__(self):
-        return unicode(self.netid)
+        return self.netid.decode('utf-8')
