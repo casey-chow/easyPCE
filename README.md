@@ -27,6 +27,14 @@ $ npm run watch &
 $ python manage.py runserver
 ```
 
+Additionally, if you want scraping functionality to work, you'll need too
+set up Redis and Celery for task scheduling.
+
+```sh
+$ celery worker --app easypce
+$ python manage.py runserver
+```
+
 ## Folder Stucture
 
 This project uses a mostly custom folder structure as an almagamation of
@@ -42,8 +50,13 @@ various starting templates, adapted for our specific purposes.
 
 ## Thanks
 
-- [Using React with Django, with a little help from Webpack](https://geezhawk.github.io/using-react-with-django-rest-framework)
-- [Django REST Framework Tutorial](http://www.django-rest-framework.org/tutorial/1-serialization/)
+- [Using React with Django, with a little help from Webpack][1]
+- [Django REST Framework Tutorial][2]
+- [First Steps with Django (Celery)][3]
+
+[1]: https://geezhawk.github.io/using-react-with-django-rest-framework
+[2]: http://www.django-rest-framework.org/tutorial/1-serialization/
+[3]: http://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
 
 ---
 

@@ -121,7 +121,9 @@ COMPRESS_ENABLED = env.bool('COMPRESS_ENABLED', default=True)
 # https://docs.djangoproject.com/en/dev/ref/templates/api/#django.template.loaders.cached.Loader
 TEMPLATES[0]['OPTIONS']['loaders'] = [
     ('django.template.loaders.cached.Loader', [
-        'django.template.loaders.filesystem.Loader', 'django.template.loaders.app_directories.Loader', ]),
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    ]),
 ]
 
 # DATABASE CONFIGURATION
@@ -158,6 +160,13 @@ WEBPACK_LOADER['DEFAULT'].update({
     'CACHE': True,
     'STATS_FILE': str(ROOT_DIR.path('webpack-stats-prod.json')),
 })
+
+
+# CELERY CONFIGURATION
+# ------------------------------------------------------------------------------
+
+CELERY_BROKER_URL = env('REDIS_URL', default='redis://')
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------
