@@ -57,7 +57,7 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for easyPCE
 LOCAL_APPS = (
-    # 'courses'
+    'api',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

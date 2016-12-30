@@ -22,11 +22,23 @@ $ python manage.py runserver
 If you intend to develop on the build, you may enjoy hot code reloading on the
 client side. To set this up, run:
 
-
 ```sh
 $ npm run watch &
 $ python manage.py runserver
 ```
+
+## Folder Stucture
+
+This project uses a mostly custom folder structure as an almagamation of
+various starting templates, adapted for our specific purposes.
+
+| Folder            | Description
+|-------------------|-------------
+| `api`             | REST API-related code
+| `easypce`         | The project folder; Django settings and routes
+| `requirements`    | Python requirements, separated by environment
+| `static`          | Static assets, including client-side code
+| `webpack`         | Webpack configuration
 
 ## Thanks
 
