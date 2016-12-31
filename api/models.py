@@ -136,7 +136,7 @@ class CourseNumber(models.Model):
     relationship because of the existence of cross-listings.
     """
 
-    course = models.ForeignKey(
+    offering = models.ForeignKey(
         'Offering',
         null=True,
         blank=True,
@@ -276,11 +276,11 @@ class Section(models.Model):
         related_name='sections',
     )
 
-    # Name, ex. S01, B03
+    # Name, ex. S01, B03, P01A
     name = models.CharField(
-        max_length=3,
+        max_length=5,
         validators=[RegexValidator(
-            regex=r'^[A-Z]\d\d$',
+            regex=r'^[A-Z]\d\d[A-Z]?$',
             message='section name is invalid',
         )],
     )
