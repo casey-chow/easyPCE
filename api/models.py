@@ -103,7 +103,8 @@ class Subject(models.Model):
     # The pretty name for the subject
     name = models.CharField(
         max_length=100,
-        unique=True
+        unique=True,
+        blank=True,
     )
 
     def __unicode__(self):
@@ -113,23 +114,19 @@ class Subject(models.Model):
 class Course(models.Model):
 
     """
-    Represents a course, ex. COS 217. Note that this model
-    represents a course over all terms, as opposed to an Offering, which
-    occurs over one term.
+    Represents a course, ex. COS 217. Note that this model represents a
+    course over all terms, as opposed to an Offering, which occurs over
+    one term.
     """
 
     # Course ID, as provided by the Registrar
-    id = models.PositiveIntegerField(
+    id = models.CharField(
+        max_length=10,
         primary_key=True,
     )
 
-    # Primary course number
-    # put in string because CourseNumber hasn't yet been defined
-    # http://stackoverflow.com/a/3682524/237904
-    num = models.ForeignKey(
-        'CourseNumber',
-        related_name='+',  # don't create a back-reference
-    )
+    def __unicode__(self):
+        return unicode(self.id)
 
 
 class CourseNumber(models.Model):
@@ -140,19 +137,24 @@ class CourseNumber(models.Model):
     """
 
     course = models.ForeignKey(
-        Course,
-        # must be allowed to be blank so that circular creation
-        # doesn't occur
+        'Offering',
         null=True,
         blank=True,
+        related_name='cross_listings',  # anything not the primary # is a xlist
+        on_delete=models.CASCADE,  # delete if course deleted
     )
-    subject = models.ForeignKey(Subject)
-    num = models.CharField(
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE,  # delete if subject deleted
+        related_name='course_numbers',
+    )
+    # the number itself, including suffixes, ex. 201C
+    number = models.CharField(
         max_length=5,
     )
 
     def __unicode__(self):
-        return u'%s %s' % (self.subject.code, self.num)
+        return u'%s %s' % (self.subject.code, self.number)
 
 
 class Instructor(models.Model):
@@ -183,15 +185,37 @@ class Offering(models.Model):
     """
     Represents a course offering, ex. COS 217, Fall 2016. This is as opposed
     to a Course, which represents a course over time.
+
+    Yes, I know it gets confusing. Sorry, but there's really no other way to
+    distinguish across terms. So ask yourself this rule of thumb when trying
+    to choose between a Course and an Offering: does this apply to _every_
+    term? Or can it change between terms?
     """
 
     # Course Identifiers
+    guid = models.IntegerField(
+        primary_key=True,
+    )
     title = models.CharField(
         max_length=150,
     )
-    course = models.ForeignKey(Course)
-    term = models.ForeignKey(Term)
-    course_nums = models.ManyToManyField(CourseNumber)
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='offerings',
+    )
+    term = models.ForeignKey(
+        Term,
+        on_delete=models.CASCADE,
+        related_name='offerings',
+    )
+
+    # Primary course number (not cross-listings)
+    primary_number = models.ForeignKey(
+        CourseNumber,
+        on_delete=models.PROTECT,  # preserve Offering CourseNumber delete
+        related_name='+',  # don't create a back-reference
+    )
 
     # PDF/Audit information
     # None indicates a lack of indication on the PDF status
@@ -211,6 +235,7 @@ class Offering(models.Model):
             ('STL', 'Science and Technology with Lab'),
             ('STN', 'Science and Technology, no Lab'),
         ),
+        blank=True,
     )
 
     # Official description
@@ -230,7 +255,7 @@ class Offering(models.Model):
     )
 
     def __unicode__(self):
-        return unicode(title)
+        return u'%s (%s)' % (self.title, self.term)
 
 
 class Section(models.Model):
@@ -242,6 +267,13 @@ class Section(models.Model):
     # Class number used to enroll
     id = models.PositiveIntegerField(
         primary_key=True
+    )
+
+    # Parent offering
+    offering = models.ForeignKey(
+        Offering,
+        on_delete=models.CASCADE,
+        related_name='sections',
     )
 
     # Name, ex. S01, B03
@@ -260,12 +292,35 @@ class Section(models.Model):
 
     # Status
     status = models.CharField(
-        max_length=1,
-        choices=(
-            ('O', 'Open'),
-            ('C', 'Closed'),
-            ('X', 'Canceled'),
-        )
+        max_length=10,
+        validators=[RegexValidator(
+            regex=r'^[a-zA-Z]+$',
+            message='status name is invalid',
+        )],
+    )
+
+    # Enrollment and Capacity
+    enrollment = models.PositiveIntegerField()
+    capacity = models.PositiveIntegerField()
+
+    def __unicode__(self):
+        return self.name.decode('utf-8')
+
+
+class Meeting(models.Model):
+
+    """
+    Represents a class meeting, within a section.
+    Why is this necesary, you ask? Because of this shit:
+    https://registrar.princeton.edu/course-offerings/
+    course_details.xml?courseid=010006&term=1172
+    Seriously, Princeton? Get your shit together yo. I
+    had to refactor my models because of your shit.
+    """
+    section = models.ForeignKey(
+        Section,
+        on_delete=models.CASCADE,
+        related_name='meetings',
     )
 
     # Times and Dates
@@ -282,15 +337,16 @@ class Section(models.Model):
         )],
     )
 
-    # Enrollment and Capacity
-    enrollment = models.PositiveIntegerField()
-    capacity = models.PositiveIntegerField()
-
     # Meeting Location
     # Format should be [Building] [Room #]
     location = models.CharField(
         max_length=100,
+        blank=True,
     )
+
+    def __unicode__(self):
+        return u'%s %s %s at %s' % (self.days, self.start_time,
+                                    self.end_time, self.location)
 
 
 class Evaluation(models.Model):
@@ -299,7 +355,11 @@ class Evaluation(models.Model):
     Represents an evaluation metric given to a course offering.
     """
 
-    course = models.ForeignKey(Offering)
+    offering = models.ForeignKey(
+        Offering,
+        on_delete=models.CASCADE,
+        related_name='evaluations',
+    )
 
     question_text = models.CharField(
         max_length=100,
@@ -324,7 +384,11 @@ class Advice(models.Model):
     already taken a given course.
     """
 
-    offering = models.ForeignKey(Offering)
+    offering = models.ForeignKey(
+        Offering,
+        on_delete=models.CASCADE,
+        related_name='advice',
+    )
     text = models.TextField()
 
 
