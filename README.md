@@ -31,8 +31,16 @@ Additionally, if you want scraping functionality to work, you'll need too
 set up Redis and Celery for task scheduling.
 
 ```sh
-$ celery worker --app easypce
+$ celery worker -A easypce -l info
 $ python manage.py runserver
+```
+
+You can also do lots of fun stuff with concurrency if you use [Celery multi]:
+
+[Celery multi]: http://docs.celeryproject.org/en/latest/reference/celery.bin.multi.html
+
+```sh
+$ celery multi start num\_workers -A easypce -l info
 ```
 
 ## Folder Stucture

@@ -80,13 +80,14 @@ class Term(UUIDModel):
     )
 
     # Season and year of term
+    SEASONS = Choices(
+        ('S', 'S', 'Spring'),
+        ('SU', 'SU', 'Summer'),
+        ('F', 'F', 'Fall'),
+    )
     season = models.CharField(
         max_length=2,
-        choices=(
-            ('S', 'Spring'),
-            ('SU', 'Summer'),
-            ('F', 'Fall'),
-        ),
+        choices=SEASONS,
     )
     year = models.PositiveSmallIntegerField(
         validators=[  # sanity check constraints
@@ -248,18 +249,20 @@ class Offering(UUIDModel):
     audit = models.NullBooleanField()
 
     # Distribution Requirement
+    # http://www.b-list.org/weblog/2007/nov/02/handle-choices-right-way/
+    DIST_REQ = Choices(
+        ('EC', 'EC', 'Epistemology and Cognition'),
+        ('EM', 'EM', 'Ethical Thought and Moral Values'),
+        ('HA', 'HA', 'Historical Analysis'),
+        ('LA', 'LA', 'Literature and the Arts'),
+        ('QR', 'QR', 'Quantitative Reasoning'),
+        ('SA', 'SA', 'Social Analysis'),
+        ('STL', 'STL', 'Science and Technology with Lab'),
+        ('STN', 'STN', 'Science and Technology, no Lab'),
+    )
     dist_req = models.CharField(
         max_length=3,
-        choices=(
-            ('EC', 'Epistemology and Cognition'),
-            ('EM', 'Ethical Thought and Moral Values'),
-            ('HA', 'Historical Analysis'),
-            ('LA', 'Literature and the Arts'),
-            ('QR', 'Quantitative Reasoning'),
-            ('SA', 'Social Analysis'),
-            ('STL', 'Science and Technology with Lab'),
-            ('STN', 'Science and Technology, no Lab'),
-        ),
+        choices=DIST_REQ,
         blank=True,
     )
 
@@ -312,22 +315,53 @@ class Section(UUIDModel):
     )
 
     # Type, ex. lecture, lab, etc.
-    type = models.CharField(
-        max_length=10,  # 'Seminar' is 7 chars
+    # https://github.com/PrincetonUSG/recal/blob/master/course_selection/models.py#L93
+    TYPE_CODES = Choices(
+        ('CLASS', 'C', 'Class'),
+        ('DRILL', 'D', 'Drill'),
+        ('EAR_TRAINING', 'E', 'Ear training'),
+        ('FILM', 'F', 'Film'),
+        ('LAB', 'B', 'Lab'),
+        ('LECTURE', 'L', 'Lecture'),
+        ('PRECEPT', 'P', 'Precept'),
+        ('SEMINAR', 'S', 'Seminar'),
+        ('STUDIO', 'U', 'Studio'),
     )
+    type_code = models.CharField(
+        max_length=1,
+        choices=TYPE_CODES,
+    )
+
+    @property
+    def type(self):
+        return TYPE_CODES.for_value(self.type_code).display
+
+    @type.setter
+    def set_type(self):
+        self.type_code = TYPE_CODES.for_display(val).value
 
     # Status
-    status = models.CharField(
-        max_length=10,
-        validators=[RegexValidator(
-            regex=r'^[a-zA-Z]+$',
-            message='status name is invalid',
-        )],
+    STATUS_CODES = Choices(
+        ('OPEN', 'O', 'Open'),
+        ('CLOSED', 'C', 'Closed'),
+        ('CANCELLED', 'X', 'Cancelled'),
+    )
+    status_code = models.CharField(
+        max_length=1,
+        choices=STATUS_CODES,
     )
 
+    @property
+    def status(self):
+        return STATUS_CODES.for_value(self.status_code).display
+
+    @status.setter
+    def set_status(self, val):
+        self.status_code = STATUS_CODES.for_display(val).value
+
     # Enrollment and Capacity
-    enrollment = models.PositiveIntegerField()
-    capacity = models.PositiveIntegerField()
+    enrollment = models.PositiveSmallIntegerField()
+    capacity = models.PositiveSmallIntegerField()
 
     def __unicode__(self):
         return self.name.decode('utf-8')

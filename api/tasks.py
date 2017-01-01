@@ -31,6 +31,7 @@ def scrape_terms():
 
     # Insert terms not already in the database
     for term_data in terms:
+        logger.info('attempting import of term %s' % term_data['code'])
         term, created = Term.objects.get_or_create(
             code=term_data['code'],
             defaults={
@@ -40,9 +41,8 @@ def scrape_terms():
                 'end_date': term_data['end_date'],
             },
         )
-
         if created:
-            logger.info('imported term meta %s' % term)
+            logger.info('created term meta %s' % term)
 
     return terms
 
@@ -57,79 +57,17 @@ def scrape_subjects():
 
     # Insert subjects not already in the database
     for subject_data in subjects:
+        logger.info('attempting import of subject %s' % subject_data['code'])
         subject, created = Subject.objects.get_or_create(
             code=subject_data['code'],
             defaults={
                 'name': subject_data['name'],
             },
         )
-
         if created:
-            logger.info('imported subject meta %s' % subject)
+            logger.info('created subject meta %s' % subject)
 
     return subjects
-
-
-def import_crosslistings(xlists_data, offering):
-    """
-    Import the given crosslistings data into the offering, setting up the
-    proper many to one relationship as well.
-    """
-    for xlist_data in xlists_data:
-        subject = Subject.objects.get(code=xlist_data['subject'])
-        course_num, created = subject.course_numbers.get_or_create(
-            number=xlist_data['catalog_number'],
-        )
-        # course_num.course = offering
-        # course_num.save()
-        offering.cross_listings.add(course_num)
-
-
-def import_instructors(instructors_data, offering):
-    """
-    Import the given instructors data into the database.
-    Does not associate them to the course.
-    """
-    for instructor_data in instructors_data:
-        instructor, created = Instructor.objects.get_or_create(
-            emplid=instructor_data['emplid'],
-            defaults={
-                'first_name': instructor_data['first_name'],
-                'last_name': instructor_data['last_name'],
-            },
-        )
-
-
-def import_meetings(meetings_data, section):
-    """Import and overwrite the given meetings data into the offering."""
-    section.meetings.all().delete()
-    for meeting_data in meetings_data:
-        location = ''
-        if 'room' in meeting_data:
-            location = '%s %s' % (meeting_data['building']['name'],
-                                  meeting_data['room'])
-
-        meeting = section.meetings.create(
-            start_time=meeting_data['start_time'],
-            end_time=meeting_data['end_time'],
-            location=location,
-        )
-
-
-def import_sections(sections_data, offering):
-    """Import and overwrite the given sections data into the offering."""
-    offering.sections.all().delete()
-    for section_data in sections_data:
-        section = offering.sections.create(
-            id=section_data['class_number'],
-            name=section_data['section'],
-            type=section_data['type_name'],
-            status=section_data['status'],
-            enrollment=int(section_data['enrollment']),
-            capacity=int(section_data['capacity']),
-        )
-
-        import_meetings(section_data['schedule']['meetings'], section)
 
 
 @shared_task
@@ -145,16 +83,81 @@ def scrape_courses_in_subject(term_code, subj_code):
     courses = registrar.courses.scrape(term_code, subj_code)
     course_ids = []
 
+    def import_crosslistings(xlists_data, offering):
+        """
+        Import the given crosslistings data into the offering, setting up the
+        proper many to one relationship as well.
+        """
+        for xlist_data in xlists_data:
+            subject = Subject.objects.get(code=xlist_data['subject'])
+            course_num, created = subject.course_numbers.get_or_create(
+                number=xlist_data['catalog_number'],
+            )
+            course_num.course = offering
+            course_num.save()
+
+    def import_instructors(instructors_data, offering):
+        """
+        Import the given instructors data into the database.
+        Does not associate them to the course.
+        """
+        for instructor_data in instructors_data:
+            logger.info('attempting import of instructor %s'
+                        % instructor_data['emplid'])
+            instructor, created = Instructor.objects.get_or_create(
+                emplid=instructor_data['emplid'],
+                defaults={
+                    'first_name': instructor_data['first_name'],
+                    'last_name': instructor_data['last_name'],
+                },
+            )
+            if created:
+                logger.info('created instructor %s' % instructor)
+
+    def import_meetings(meetings_data, section):
+        """Import and overwrite the given meetings data into the offering."""
+        section.meetings.all().delete()
+        for meeting_data in meetings_data:
+            location = ''
+            if 'room' in meeting_data:
+                location = '%s %s' % (meeting_data['building']['name'],
+                                      meeting_data['room'])
+
+            logger.info('attempting import of meeting at %s' % location)
+            meeting = section.meetings.create(
+                start_time=meeting_data['start_time'],
+                end_time=meeting_data['end_time'],
+                location=location,
+            )
+            logger.info('created meeting %s' % meeting)
+
+    def import_sections(sections_data, offering):
+        """Import and overwrite the given sections data into the offering."""
+        offering.sections.all().delete()
+        for section_data in sections_data:
+            logger.info('attempting import of section %s'
+                        % section_data['class_number'])
+            type_ = Section.TYPE_CODES.for_display(section_data['type_name'])
+            status = Section.STATUS_CODES.for_display(section_data['status'])
+            section = offering.sections.create(
+                class_id=section_data['class_number'],
+                name=section_data['section'],
+                type_code=type_.value,
+                status_code=status.value,
+                enrollment=int(section_data['enrollment']),
+                capacity=int(section_data['capacity']),
+            )
+            logger.info('imported section %s' % section)
+
+            import_meetings(section_data['schedule']['meetings'], section)
+
     for course_data in courses:
         course, created = Course.objects.get_or_create(
             course_id=course_data['course_id'],
         )
         if created:
-            logger.info('new course %s' % course)
-
-        # Scrape details and evals for the course as well
-        scrape_details.delay(term_code, course.course_id)
-        scrape_evals.delay(term_code, course.course_id)
+            logger.info('imported course %s' % course)
+        course_ids.append(course.course_id)
 
         # Primary course number
         course_num, created = subject.course_numbers.get_or_create(
@@ -162,6 +165,7 @@ def scrape_courses_in_subject(term_code, subj_code):
         )
 
         # Current offering
+        logger.info('attempting import of offering %s' % course_data['guid'])
         offering, created = course.offerings.get_or_create(
             guid=course_data['guid'],
             defaults={
@@ -171,6 +175,8 @@ def scrape_courses_in_subject(term_code, subj_code):
                 'primary_number': course_num,
             },
         )
+        if created:
+            logger.info('imported offering %s' % offering)
 
         # this comes first so that the main course num id isn't overwritten
         offering.cross_listings.clear()
@@ -182,15 +188,21 @@ def scrape_courses_in_subject(term_code, subj_code):
         import_instructors(course_data['instructors'], offering)
         import_sections(course_data['classes'], offering)
 
+        # Scrape details and evals for the course as well
+        scrape_details.delay(term_code, course.course_id)
+        scrape_evals.delay(term_code, course.course_id)
+
     return course_ids
 
 
-@shared_task
+@shared_task(time_limit=30)
 def scrape_details(term_code, course_id):
     """
     Supplements existing course information with details, if possible.
     Assumes that instructors are already in the DB.
     """
+    logger.info('attempting import of details for %s in term %d'
+                % (course_id, term_code))
     offering = Offering.objects.get(term__code=term_code,
                                     course__course_id=course_id)
     details = registrar.course_details.scrape(term_code, course_id)
@@ -205,18 +217,20 @@ def scrape_details(term_code, course_id):
     offering.instructors.set(instructors)
 
     offering.save()
+    logger.info('imported details for %s in term %d' % (course_id, term_code))
 
 
-@shared_task
+@shared_task(time_limit=30)
 def scrape_evals(term_code, course_id):
     """
     Delete and scrape all evaluations for a given course offering.
     """
+    logger.info('attempting import of evals for %s in term %d'
+                % (course_id, term_code))
     offering = Offering.objects.get(course__course_id=course_id,
                                     term__code=int(term_code))
     stats, comments = registrar.evals.scrape(term_code, course_id)
 
-    # Insert evaluations
     offering.evaluations.all().delete()
     for question, response in stats.iteritems():
         offering.evaluations.create(
@@ -224,10 +238,11 @@ def scrape_evals(term_code, course_id):
             response_avg=response,
         )
 
-    # Insert advice
     offering.advice.all().delete()
     for comment in comments:
         offering.advice.create(text=comment)
+
+    logger.info('imported evals for %s in term %d' % (course_id, term_code))
 
 
 @shared_task
