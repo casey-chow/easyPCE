@@ -6,13 +6,18 @@ from django.core.management.base import BaseCommand, CommandError
 import celery
 
 from api import tasks
+from api.models import Term
 from pprint import PrettyPrinter
+
+pp = PrettyPrinter()
 
 
 class Command(BaseCommand):
     help = 'Scrapes the registrar for course data and evaluations.'
 
     def add_arguments(self, parser):
+        parser.add_argument('--all', action='store_true',
+                            help='scrape for all possible information')
         parser.add_argument('--meta', action='store_true',
                             help='scrape the term and subject meta')
         parser.add_argument('--terms', nargs='+', metavar='term',
@@ -20,19 +25,19 @@ class Command(BaseCommand):
         # TODO: incremental
 
     def handle(self, *args, **options):
-        pp = PrettyPrinter()
-        pp.pprint(args)
-        pp.pprint(options)
         task_q = []
 
-        if options['meta']:
+        def all_terms():
+            return [t.code for t in Term.objects.all()]
+
+        if options['meta'] or options['all']:
             task_q.append(celery.group([
                 tasks.scrape_terms.s(),
                 tasks.scrape_subjects.s(),
             ]))
 
-        if 'terms' in options:
-            terms = options['terms']
+        if 'terms' in options or options['all']:
+            terms = options['terms'] if not options['all'] else all_terms()
             task_q.append(celery.group([tasks.scrape_courses_in_term.s(t)
                                         for t in terms]))
 
