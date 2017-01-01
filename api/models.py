@@ -1,18 +1,41 @@
 """
 Models for the easyPCE API. The terminology used here closely
 maps to the OIT WebFeeds API.
+
+Design Decisions:
+- The format of these values may change erratically, so we use surrogate keys
+  instead of natural keys for the primary key, even when provided.
+- We use UUID primary keys because they deal with concurrent inserts a lot
+  better than sequentials.
 """
 from __future__ import unicode_literals
 import re
+import uuid
 from django.utils.timezone import now
 
 from django.db import models
 from django.core.validators import RegexValidator
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
+from extended_choices import Choices
 
 
-class Term(models.Model):
+class UUIDModel(models.Model):
+    """
+    This abstract model automatically uses UUID fields for the models instead
+    of auto-incrementing integers.
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Term(UUIDModel):
 
     """
     Represents a term, such as 2016 Fall. A term has many
@@ -41,11 +64,11 @@ class Term(models.Model):
 
     # Numeric code used in the registrar
     code = models.PositiveSmallIntegerField(
-        unique=True,
         validators=[
             MinValueValidator(1000),
             MaxValueValidator(10000),
         ],
+        unique=True,
     )
 
     # Start and end dates
@@ -83,7 +106,7 @@ class Term(models.Model):
         return self.name.decode('utf-8')
 
 
-class Subject(models.Model):
+class Subject(UUIDModel):
 
     """
     Represents a subject, ex. COS, CBE, EGR. A subject can have
@@ -97,6 +120,7 @@ class Subject(models.Model):
             regex=r'[A-Z]{3}',
             message='invalid subject code'
         )],
+        unique=True,
     )
 
     # The pretty name for the subject
@@ -110,7 +134,7 @@ class Subject(models.Model):
         return self.name.decode('utf-8')
 
 
-class Course(models.Model):
+class Course(UUIDModel):
 
     """
     Represents a course, ex. COS 217. Note that this model represents a
@@ -121,13 +145,14 @@ class Course(models.Model):
     # Course ID, as provided by the Registrar
     course_id = models.CharField(
         max_length=10,
+        unique=True,
     )
 
     def __unicode__(self):
         return unicode(self.course_id)
 
 
-class CourseNumber(models.Model):
+class CourseNumber(UUIDModel):
 
     """
     Represents the actual catalog number of a course. This is a many-to-many
@@ -155,7 +180,7 @@ class CourseNumber(models.Model):
         return u'%s %s' % (self.subject.code, self.number)
 
 
-class Instructor(models.Model):
+class Instructor(UUIDModel):
 
     """
     Represents an instructor.
@@ -172,13 +197,14 @@ class Instructor(models.Model):
     # Employee ID, as given in OIT WebFeeds
     emplid = models.CharField(
         max_length=15,
+        unique=True,
     )
 
     def __unicode__(self):
         return u"%s %s" % (self.first_name, self.last_name)
 
 
-class Offering(models.Model):
+class Offering(UUIDModel):
 
     """
     Represents a course offering, ex. COS 217, Fall 2016. This is as opposed
@@ -257,15 +283,16 @@ class Offering(models.Model):
         return u'%s (%s)' % (self.title, self.term)
 
 
-class Section(models.Model):
+class Section(UUIDModel):
 
     """
     Represents a class section, such as a seminar or lecture.
     """
 
     # Class number used to enroll
-    guid = models.CharField(
+    class_id = models.CharField(
         max_length=15,
+        unique=True,
     )
 
     # Parent offering
@@ -306,7 +333,7 @@ class Section(models.Model):
         return self.name.decode('utf-8')
 
 
-class Meeting(models.Model):
+class Meeting(UUIDModel):
 
     """
     Represents a class meeting, within a section.
@@ -348,7 +375,7 @@ class Meeting(models.Model):
                                     self.end_time, self.location)
 
 
-class Evaluation(models.Model):
+class Evaluation(UUIDModel):
 
     """
     Represents an evaluation metric given to a course offering.
@@ -376,7 +403,7 @@ class Evaluation(models.Model):
         return u'%s: %.2f' % (self.question_text, self.response_avg)
 
 
-class Advice(models.Model):
+class Advice(UUIDModel):
 
     """
     Represents advice given to future students by people who had
@@ -391,7 +418,7 @@ class Advice(models.Model):
     text = models.TextField()
 
 
-class User(models.Model):
+class User(UUIDModel):
 
     """
     Custom user profile.
