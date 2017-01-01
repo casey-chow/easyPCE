@@ -38,6 +38,7 @@ DJANGO_APPS = (
     # 'django.contrib.humanize',
 
     # Admin
+    'grappelli',
     'django.contrib.admin',
 )
 

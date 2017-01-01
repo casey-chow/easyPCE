@@ -11,6 +11,7 @@ django-crispy-forms==1.6.1
 
 # Models
 django-model-utils==2.6
+django-extended-choices==1.1.1
 
 # Images
 Pillow==3.4.2
@@ -39,4 +40,5 @@ rcssmin==1.0.6
 django-compressor==2.1
 
 
-# Your custom requirements go here
+# Grapelli
+django-grappelli==2.9.1

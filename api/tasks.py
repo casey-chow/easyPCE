@@ -15,11 +15,12 @@ from .models import Offering
 from .models import Section
 from .models import Evaluation
 from .models import Advice
-import pudb
 
 logger = get_task_logger(__name__)
 
 
+# TODO: make a function that allows for incremental scraping so that
+# this worker isn't running forever
 @shared_task
 def scrape_terms():
     """
