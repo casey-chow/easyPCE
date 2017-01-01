@@ -22,11 +22,11 @@ class Term(models.Model):
     # Suffix code, ex. F2016 or SU2015
     suffix = models.CharField(
         max_length=6,  # longest code available is SU####
-        primary_key=True,
         validators=[RegexValidator(
             regex=r'^(?:S|SU|F)\d{4}$',
             message='suffix is invalid',
         )],
+        unique=True,
     )
 
     # Pretty name
@@ -97,7 +97,6 @@ class Subject(models.Model):
             regex=r'[A-Z]{3}',
             message='invalid subject code'
         )],
-        primary_key=True,
     )
 
     # The pretty name for the subject
@@ -120,13 +119,12 @@ class Course(models.Model):
     """
 
     # Course ID, as provided by the Registrar
-    id = models.CharField(
+    course_id = models.CharField(
         max_length=10,
-        primary_key=True,
     )
 
     def __unicode__(self):
-        return unicode(self.id)
+        return unicode(self.course_id)
 
 
 class CourseNumber(models.Model):
@@ -172,8 +170,8 @@ class Instructor(models.Model):
     )
 
     # Employee ID, as given in OIT WebFeeds
-    id = models.PositiveIntegerField(
-        primary_key=True,
+    emplid = models.CharField(
+        max_length=15,
     )
 
     def __unicode__(self):
@@ -193,9 +191,7 @@ class Offering(models.Model):
     """
 
     # Course Identifiers
-    guid = models.IntegerField(
-        primary_key=True,
-    )
+    guid = models.IntegerField()
     title = models.CharField(
         max_length=150,
     )
@@ -213,13 +209,16 @@ class Offering(models.Model):
     # Primary course number (not cross-listings)
     primary_number = models.ForeignKey(
         CourseNumber,
-        on_delete=models.PROTECT,  # preserve Offering CourseNumber delete
+        on_delete=models.CASCADE,  # delete model if primary number gone
         related_name='+',  # don't create a back-reference
     )
 
     # PDF/Audit information
     # None indicates a lack of indication on the PDF status
     pdf = models.NullBooleanField()
+    pdf_only = models.BooleanField(
+        default=False,
+    )
     audit = models.NullBooleanField()
 
     # Distribution Requirement
@@ -265,8 +264,8 @@ class Section(models.Model):
     """
 
     # Class number used to enroll
-    id = models.PositiveIntegerField(
-        primary_key=True
+    guid = models.CharField(
+        max_length=15,
     )
 
     # Parent offering
@@ -400,7 +399,6 @@ class User(models.Model):
 
     netid = models.CharField(
         max_length=15,
-        primary_key=True,
     )
 
     def __unicode__(self):

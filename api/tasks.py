@@ -2,7 +2,7 @@
 Tasks to scrape the registrar for the API.
 """
 from __future__ import absolute_import, unicode_literals
-from celery import shared_task
+from celery import shared_task, group
 from celery.utils.log import get_task_logger
 from princeton_scrapers import registrar
 
@@ -15,6 +15,7 @@ from .models import Offering
 from .models import Section
 from .models import Evaluation
 from .models import Advice
+import pudb
 
 logger = get_task_logger(__name__)
 
@@ -84,19 +85,18 @@ def import_crosslistings(xlists_data, offering):
 
 
 def import_instructors(instructors_data, offering):
-    """Import and overwrite the given instructors data into the offering."""
-    offering.instructors.clear()
+    """
+    Import the given instructors data into the database.
+    Does not associate them to the course.
+    """
     for instructor_data in instructors_data:
         instructor, created = Instructor.objects.get_or_create(
-            id=instructor_data['emplid'],
+            emplid=instructor_data['emplid'],
             defaults={
                 'first_name': instructor_data['first_name'],
                 'last_name': instructor_data['last_name'],
             },
         )
-        offering.instructors.add(instructor)
-
-    # TODO: scrape the actual professor from registrar
 
 
 def import_meetings(meetings_data, section):
@@ -132,14 +132,13 @@ def import_sections(sections_data, offering):
 
 
 @shared_task
-def scrape_courses(term_code, subj_code):
+def scrape_courses_in_subject(term_code, subj_code):
     """
     Scrapes all courses from web feeds and inserts them into the database.
     Returns a list of the course ids found.
     Fails loudly if a subject is not already in the database, so make sure that
     scrape_subjects is run first.
     """
-    pu.db
     subject = Subject.objects.get(code=subj_code)
     term = Term.objects.get(code=term_code)
     courses = registrar.courses.scrape(term_code, subj_code)
@@ -147,11 +146,14 @@ def scrape_courses(term_code, subj_code):
 
     for course_data in courses:
         course, created = Course.objects.get_or_create(
-            id=course_data['course_id'],
+            course_id=course_data['course_id'],
         )
         if created:
             logger.info('new course %s' % course)
-        course_ids.append(course.id)
+
+        # Scrape details and evals for the course as well
+        scrape_details.delay(term_code, course.course_id)
+        scrape_evals.delay(term_code, course.course_id)
 
         # Primary course number
         course_num, created = subject.course_numbers.get_or_create(
@@ -176,7 +178,6 @@ def scrape_courses(term_code, subj_code):
 
         if 'cross_listings' in course_data:
             import_crosslistings(course_data['cross_listings'], offering)
-        # TODO: scrape dist reqs, PDF/Audit, addl info from course_details.py
         import_instructors(course_data['instructors'], offering)
         import_sections(course_data['classes'], offering)
 
@@ -184,11 +185,33 @@ def scrape_courses(term_code, subj_code):
 
 
 @shared_task
+def scrape_details(term_code, course_id):
+    """
+    Supplements existing course information with details, if possible.
+    Assumes that instructors are already in the DB.
+    """
+    offering = Offering.objects.get(term__code=term_code,
+                                    course__course_id=course_id)
+    details = registrar.course_details.scrape(term_code, course_id)
+
+    offering.additional_info = details['additional_info']
+    offering.pdf = details['enroll_params']['pdf']
+    offering.pdf_only = details['enroll_params']['pdf_only'] or False
+    offering.audit = details['enroll_params']['audit']
+    offering.dist_req = details['dist_req'] or ''
+
+    instructors = Instructor.objects.filter(emplid__in=details['instructors'])
+    offering.instructors.set(instructors)
+
+    offering.save()
+
+
+@shared_task
 def scrape_evals(term_code, course_id):
     """
     Delete and scrape all evaluations for a given course offering.
     """
-    offering = Offering.objects.get(course__id=course_id,
+    offering = Offering.objects.get(course__course_id=course_id,
                                     term__code=int(term_code))
     stats, comments = registrar.evals.scrape(term_code, course_id)
 
@@ -204,3 +227,15 @@ def scrape_evals(term_code, course_id):
     offering.advice.all().delete()
     for comment in comments:
         offering.advice.create(text=comment)
+
+
+@shared_task
+def scrape_courses_in_term(term_code):
+    """
+    Scrapes all courses in the given term.
+    TODO: Make this incremental.
+    """
+    subjects = [subject.code for subject in Subject.objects.all()]
+    tasks = [scrape_courses_in_subject.s(term_code, subject)
+             for subject in subjects]
+    group(tasks)()
