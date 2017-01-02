@@ -14,6 +14,7 @@ import socket
 import os
 from .common import *  # noqa
 
+print 'dev'
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool('DJANGO_DEBUG', default=True)

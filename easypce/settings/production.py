@@ -19,6 +19,8 @@ from django.utils import six
 
 from .common import *  # noqa
 
+print 'prod'
+
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
