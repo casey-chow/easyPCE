@@ -7,7 +7,6 @@ import os
 from celery import Celery
 
 # set the default Django settings module for the 'celery' program.
-# TODO: figure out if this changes in production
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'easypce.settings.local')
 
 app = Celery('easypce')

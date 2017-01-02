@@ -16,10 +16,8 @@ from __future__ import absolute_import, unicode_literals
 from boto.s3.connection import OrdinaryCallingFormat
 from django.utils import six
 
-
 from .common import *  # noqa
 
-print 'prod'
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
