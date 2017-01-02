@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Production Configurations
@@ -28,18 +29,6 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 # This ensures that Django will be able to detect a secure connection
 # properly on Heroku.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# opbeat integration
-# See https://opbeat.com/languages/django/
-INSTALLED_APPS += ('opbeat.contrib.django',)
-OPBEAT = {
-    'ORGANIZATION_ID': env('DJANGO_OPBEAT_ORGANIZATION_ID'),
-    'APP_ID': env('DJANGO_OPBEAT_APP_ID'),
-    'SECRET_TOKEN': env('DJANGO_OPBEAT_SECRET_TOKEN')
-}
-MIDDLEWARE = (
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-) + MIDDLEWARE
 
 
 # SECURITY CONFIGURATION
@@ -78,31 +67,31 @@ INSTALLED_APPS += ('gunicorn', )
 # Uploaded Media Files
 # ------------------------
 # See: http://django-storages.readthedocs.io/en/latest/index.html
-INSTALLED_APPS += (
-    'storages',
-)
+# INSTALLED_APPS += (
+#     'storages',
+# )
 
-AWS_ACCESS_KEY_ID = env('DJANGO_AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = env('DJANGO_AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = env('DJANGO_AWS_STORAGE_BUCKET_NAME')
-AWS_AUTO_CREATE_BUCKET = True
-AWS_QUERYSTRING_AUTH = False
-AWS_S3_CALLING_FORMAT = OrdinaryCallingFormat()
+# AWS_ACCESS_KEY_ID = env('DJANGO_AWS_ACCESS_KEY_ID')
+# AWS_SECRET_ACCESS_KEY = env('DJANGO_AWS_SECRET_ACCESS_KEY')
+# AWS_STORAGE_BUCKET_NAME = env('DJANGO_AWS_STORAGE_BUCKET_NAME')
+# AWS_AUTO_CREATE_BUCKET = True
+# AWS_QUERYSTRING_AUTH = False
+# AWS_S3_CALLING_FORMAT = OrdinaryCallingFormat()
 
-# AWS cache settings, don't change unless you know what you're doing:
-AWS_EXPIRY = 60 * 60 * 24 * 7
+# # AWS cache settings, don't change unless you know what you're doing:
+# AWS_EXPIRY = 60 * 60 * 24 * 7
 
-# TODO See: https://github.com/jschneier/django-storages/issues/47
-# Revert the following and use str after the above-mentioned bug is fixed in
-# either django-storage-redux or boto
-AWS_HEADERS = {
-    'Cache-Control': six.b('max-age=%d, s-maxage=%d, must-revalidate' % (
-        AWS_EXPIRY, AWS_EXPIRY))
-}
+# # TODO See: https://github.com/jschneier/django-storages/issues/47
+# # Revert the following and use str after the above-mentioned bug is fixed in
+# # either django-storage-redux or boto
+# AWS_HEADERS = {
+#     'Cache-Control': six.b('max-age=%d, s-maxage=%d, must-revalidate' % (
+#         AWS_EXPIRY, AWS_EXPIRY))
+# }
 
-# URL that handles the media served from MEDIA_ROOT, used for managing
-# stored files.
-MEDIA_URL = 'https://s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
+# # URL that handles the media served from MEDIA_ROOT, used for managing
+# # stored files.
+# MEDIA_URL = 'https://s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
 
 
 # Static Assets
@@ -111,9 +100,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # COMPRESSOR
 # ------------------------------------------------------------------------------
-COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-COMPRESS_URL = STATIC_URL
-COMPRESS_ENABLED = env.bool('COMPRESS_ENABLED', default=True)
+# COMPRESS_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+# COMPRESS_URL = STATIC_URL
+# COMPRESS_ENABLED = env.bool('COMPRESS_ENABLED', default=True)
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -158,15 +147,23 @@ CACHES = {
 WEBPACK_LOADER['DEFAULT'].update({
     'BUNDLE_DIR_NAME': 'dist/',
     'CACHE': True,
-    'STATS_FILE': str(ROOT_DIR.path('webpack-stats-prod.json')),
+    'STATS_FILE': ROOT('webpack-stats-prod.json'),
 })
 
 
 # CELERY CONFIGURATION
 # ------------------------------------------------------------------------------
 
-CELERY_BROKER_URL = env('REDIS_URL', default='redis://')
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://')
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+
+
+# SENTRY CONFIGURATION
+# ------------------------------------------------------------------------------
+
+RAVEN_CONFIG.update({
+    'environment': 'production',
+})
 
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------

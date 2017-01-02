@@ -16,14 +16,14 @@ import raven
 
 # Directory at the root of the whole project
 # easyPCE/easypce/settings/common.py - 3 = easyPCE/
-ROOT_DIR = environ.Path(__file__) - 3
+ROOT = environ.Path(__file__) - 3
 
 # The directory containing settings
 # easyPCE/easypce
-PROJECT_DIR = ROOT_DIR.path('easypce')
+PROJECT_DIR = ROOT.path('easypce')
 
 env = environ.Env()
-env.read_env()
+env.read_env(ROOT('.env'))
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -182,7 +182,7 @@ TEMPLATES = [
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = str(ROOT_DIR('staticfiles'))
+STATIC_ROOT = str(ROOT('staticfiles'))
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
@@ -190,7 +190,7 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/
 #    #std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
-    str(ROOT_DIR.path('static')),
+    ROOT('static'),
 )
 
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
@@ -259,8 +259,9 @@ CELERY_RESULT_SERIALIZER = 'msgpack'
 # ------------------------------------------------------------------------------
 
 RAVEN_CONFIG = {
-    'dsn': env('RAVEN_DSN', default=''),
-    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+    'dsn': env('SENTRY_DSN', default=''),
+    'release': raven.fetch_git_sha(ROOT()),
+    'environment': env('SENTRY_ENVIRONMENT', default='development'),
 }
 
 # ADMIN

@@ -42,7 +42,7 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'CACHE': False,
-        'STATS_FILE': str(ROOT_DIR.path('webpack-stats.json')),
+        'STATS_FILE': str(ROOT('webpack-stats.json')),
     }
 }
 

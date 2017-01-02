@@ -141,3 +141,4 @@ jspm_packages
 # Webpack
 webpack-stats.json
 static/bundles/
+staticfiles/
