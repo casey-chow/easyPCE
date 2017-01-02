@@ -10,7 +10,9 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
+import os
 import environ
+import raven
 
 # Directory at the root of the whole project
 # easyPCE/easypce/settings/common.py - 3 = easyPCE/
@@ -45,6 +47,9 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     # Django Rest Framework
     'rest_framework',
+
+    # Raven, for Sentry
+    'raven.contrib.django.raven_compat',
 
     # Enable serving of webpack bundles
     'webpack_loader',
