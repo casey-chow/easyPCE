@@ -4,9 +4,9 @@
   "description": "A better course evaluation tool.",
   "main": "index.js",
   "scripts": {
-    "test": "python manage.py test",
-    "build": "webpack --config webpack/local.config.js --progress --colors",
-    "build-production": "webpack --config webpack/production.config.js",
+    "build": "webpack --config webpack/production.config.js",
+    "build-local": "webpack --config webpack/local.config.js --progress --colors",
+    "postinstall": "npm run build",
     "watch": "node server.js"
   },
   "repository": {

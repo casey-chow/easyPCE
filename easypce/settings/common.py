@@ -23,7 +23,8 @@ ROOT = environ.Path(__file__) - 3
 PROJECT_DIR = ROOT.path('easypce')
 
 env = environ.Env()
-env.read_env(ROOT('.env'))
+if os.path.exists(ROOT('.env')):
+    env.read_env(ROOT('.env'))
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
