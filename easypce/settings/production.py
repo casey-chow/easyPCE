@@ -163,7 +163,7 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 RAVEN_CONFIG.update({
     'environment': 'production',
-    'release': env('HEROKU_SLUG_COMMIT'),
+    'release': env('HEROKU_SLUG_COMMIT', default=''),
 })
 
 # LOGGING CONFIGURATION
@@ -240,4 +240,4 @@ LOGGING = {
 }
 
 # Custom Admin URL, use {% url 'admin:index' %}
-ADMIN_URL = env('DJANGO_ADMIN_URL')
+# ADMIN_URL = env('DJANGO_ADMIN_URL')
