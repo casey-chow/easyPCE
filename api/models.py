@@ -124,7 +124,6 @@ class Subject(UUIDModel):
         unique=True,
     )
 
-    # The pretty name for the subject
     name = models.CharField(
         max_length=100,
         unique=True,
@@ -135,24 +134,6 @@ class Subject(UUIDModel):
         return self.name.decode('utf-8')
 
 
-class Course(UUIDModel):
-
-    """
-    Represents a course, ex. COS 217. Note that this model represents a
-    course over all terms, as opposed to an Offering, which occurs over
-    one term.
-    """
-
-    # Course ID, as provided by the Registrar
-    course_id = models.CharField(
-        max_length=10,
-        unique=True,
-    )
-
-    def __unicode__(self):
-        return unicode(self.course_id)
-
-
 class CourseNumber(UUIDModel):
 
     """
@@ -160,8 +141,8 @@ class CourseNumber(UUIDModel):
     relationship because of the existence of cross-listings.
     """
 
-    offering = models.ForeignKey(
-        'Offering',
+    course = models.ForeignKey(
+        'Course',
         null=True,
         blank=True,
         related_name='cross_listings',  # anything not the primary # is a xlist
@@ -179,6 +160,9 @@ class CourseNumber(UUIDModel):
 
     def __unicode__(self):
         return u'%s %s' % (self.subject.code, self.number)
+
+    class Meta:
+        unique_together = ('subject', 'number')
 
 
 class Instructor(UUIDModel):
@@ -205,35 +189,25 @@ class Instructor(UUIDModel):
         return u"%s %s" % (self.first_name, self.last_name)
 
 
-class Offering(UUIDModel):
+class Course(UUIDModel):
 
     """
-    Represents a course offering, ex. COS 217, Fall 2016. This is as opposed
-    to a Course, which represents a course over time.
-
-    Yes, I know it gets confusing. Sorry, but there's really no other way to
-    distinguish across terms. So ask yourself this rule of thumb when trying
-    to choose between a Course and an Offering: does this apply to _every_
-    term? Or can it change between terms?
+    Represents a course offering, ex. COS 217, Fall 2016.
     """
 
-    # Course Identifiers
-    guid = models.IntegerField()
+    course_id = models.CharField(
+        max_length=10,
+    )
     title = models.CharField(
         max_length=150,
-    )
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
-        related_name='offerings',
     )
     term = models.ForeignKey(
         Term,
         on_delete=models.CASCADE,
-        related_name='offerings',
+        related_name='courses',
     )
 
-    # Primary course number (not cross-listings)
+    # Primary course number
     primary_number = models.ForeignKey(
         CourseNumber,
         on_delete=models.CASCADE,  # delete model if primary number gone
@@ -243,14 +217,11 @@ class Offering(UUIDModel):
     # PDF/Audit information
     # None indicates a lack of indication on the PDF status
     pdf = models.NullBooleanField()
-    pdf_only = models.BooleanField(
-        default=False,
-    )
+    pdf_only = models.BooleanField(default=False)
     audit = models.NullBooleanField()
 
-    # Distribution Requirement
-    # http://www.b-list.org/weblog/2007/nov/02/handle-choices-right-way/
-    DIST_REQ = Choices(
+    # Distribution requirements
+    DIST_REQS = Choices(
         ('EC', 'EC', 'Epistemology and Cognition'),
         ('EM', 'EM', 'Ethical Thought and Moral Values'),
         ('HA', 'HA', 'Historical Analysis'),
@@ -262,28 +233,30 @@ class Offering(UUIDModel):
     )
     dist_req = models.CharField(
         max_length=3,
-        choices=DIST_REQ,
+        choices=DIST_REQS,
         blank=True,
     )
 
-    # Official description
     description = models.TextField(
         blank=True,
     )
-    # Other information included in the registrar
     additional_info = models.TextField(
         blank=True,
     )
-    # Instructors
-    instructors = models.ManyToManyField(Instructor)
+    instructors = models.ManyToManyField(
+        Instructor,
+        related_name='courses',
+    )
 
-    # Timestamp, for scraping
     last_updated = models.DateTimeField(
         default=now,
     )
 
     def __unicode__(self):
         return u'%s (%s)' % (self.title, self.term)
+
+    class Meta:
+        unique_together = ('course_id', 'term')
 
 
 class Section(UUIDModel):
@@ -292,15 +265,12 @@ class Section(UUIDModel):
     Represents a class section, such as a seminar or lecture.
     """
 
-    # Class number used to enroll
     class_id = models.CharField(
         max_length=15,
-        unique=True,
     )
 
-    # Parent offering
-    offering = models.ForeignKey(
-        Offering,
+    course = models.ForeignKey(
+        Course,
         on_delete=models.CASCADE,
         related_name='sections',
     )
@@ -316,50 +286,32 @@ class Section(UUIDModel):
 
     # Type, ex. lecture, lab, etc.
     # https://github.com/PrincetonUSG/recal/blob/master/course_selection/models.py#L93
-    TYPE_CODES = Choices(
-        ('CLASS', 'C', 'Class'),
-        ('DRILL', 'D', 'Drill'),
-        ('EAR_TRAINING', 'E', 'Ear training'),
-        ('FILM', 'F', 'Film'),
-        ('LAB', 'B', 'Lab'),
-        ('LECTURE', 'L', 'Lecture'),
-        ('PRECEPT', 'P', 'Precept'),
-        ('SEMINAR', 'S', 'Seminar'),
-        ('STUDIO', 'U', 'Studio'),
+    TYPES = Choices(
+        ('CLASS', 'Class', 'Class'),
+        ('DRILL', 'Drill', 'Drill'),
+        ('EAR_TRAINING', 'Ear training', 'Ear training'),
+        ('FILM', 'Film', 'Film'),
+        ('LAB', 'Lab', 'Lab'),
+        ('LECTURE', 'Lecture', 'Lecture'),
+        ('PRECEPT', 'Precept', 'Precept'),
+        ('SEMINAR', 'Seminar', 'Seminar'),
+        ('STUDIO', 'Studio', 'Studio'),
     )
-    type_code = models.CharField(
-        max_length=1,
-        choices=TYPE_CODES,
-    )
-
-    @property
-    def type(self):
-        return TYPE_CODES.for_value(self.type_code).display
-
-    @type.setter
-    def set_type(self):
-        self.type_code = TYPE_CODES.for_display(val).value
-
-    # Status
-    STATUS_CODES = Choices(
-        ('OPEN', 'O', 'Open'),
-        ('CLOSED', 'C', 'Closed'),
-        ('CANCELLED', 'X', 'Cancelled'),
-    )
-    status_code = models.CharField(
-        max_length=1,
-        choices=STATUS_CODES,
+    type = models.CharField(
+        max_length=15,
+        choices=TYPES,
     )
 
-    @property
-    def status(self):
-        return STATUS_CODES.for_value(self.status_code).display
+    STATUSES = Choices(
+        ('OPEN', 'Open', 'Open'),
+        ('CLOSED', 'Closed', 'Closed'),
+        ('CANCELLED', 'Cancelled', 'Cancelled'),
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=STATUSES,
+    )
 
-    @status.setter
-    def set_status(self, val):
-        self.status_code = STATUS_CODES.for_display(val).value
-
-    # Enrollment and Capacity
     enrollment = models.PositiveSmallIntegerField()
     capacity = models.PositiveSmallIntegerField()
 
@@ -415,8 +367,8 @@ class Evaluation(UUIDModel):
     Represents an evaluation metric given to a course offering.
     """
 
-    offering = models.ForeignKey(
-        Offering,
+    course = models.ForeignKey(
+        Course,
         on_delete=models.CASCADE,
         related_name='evaluations',
     )
@@ -444,8 +396,8 @@ class Advice(UUIDModel):
     already taken a given course.
     """
 
-    offering = models.ForeignKey(
-        Offering,
+    course = models.ForeignKey(
+        Course,
         on_delete=models.CASCADE,
         related_name='advice',
     )

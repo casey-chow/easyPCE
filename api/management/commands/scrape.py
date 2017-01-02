@@ -36,7 +36,7 @@ class Command(BaseCommand):
                 tasks.scrape_subjects.s(),
             ]))
 
-        if 'terms' in options or options['all']:
+        if options['terms'] or options['all']:
             terms = options['terms'] if not options['all'] else all_terms()
             task_q.append(celery.group([tasks.scrape_courses_in_term.s(t)
                                         for t in terms]))
