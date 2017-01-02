@@ -163,6 +163,7 @@ def scrape_courses_in_subject(term_code, subj_code):
                 'title': course_data['title'],
                 'term': term,
                 'primary_number': course_num,
+                'description': course_data['detail']['description'],
             },
         )
         # course.cross_listings.clear()
@@ -205,6 +206,8 @@ def scrape_details(term_code, course_id):
     instructors = Instructor.objects.filter(emplid__in=details['instructors'])
     course.instructors.set(instructors)
 
+    course.details_scraped = True
+    course.save()
     logger.info('imported details for %s in term %s' % (course_id, term_code))
 
 
@@ -230,6 +233,8 @@ def scrape_evals(term_code, course_id):
     for comment in comments:
         course.advice.create(text=comment)
 
+    course.evals_scraped = True
+    course.save()
     logger.info('imported evals for %s in term %s' % (course_id, term_code))
 
 

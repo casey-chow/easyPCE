@@ -21,10 +21,12 @@ from extended_choices import Choices
 
 
 class UUIDModel(models.Model):
+
     """
     This abstract model automatically uses UUID fields for the models instead
     of auto-incrementing integers.
     """
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -52,7 +54,7 @@ class Term(UUIDModel):
         unique=True,
     )
 
-    # Pretty name
+    # Pretty name, ex. Fall 2016
     name = models.CharField(
         max_length=11,  # longest name is 'Summer ####'
         validators=[RegexValidator(
@@ -62,7 +64,7 @@ class Term(UUIDModel):
         unique=True
     )
 
-    # Numeric code used in the registrar
+    # Numeric code used, ex. 1174
     code = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(1000),
@@ -71,7 +73,6 @@ class Term(UUIDModel):
         unique=True,
     )
 
-    # Start and end dates
     start_date = models.DateField(
         unique=True,
     )
@@ -79,7 +80,6 @@ class Term(UUIDModel):
         unique=True,
     )
 
-    # Season and year of term
     SEASONS = Choices(
         ('S', 'S', 'Spring'),
         ('SU', 'SU', 'Summer'),
@@ -88,12 +88,14 @@ class Term(UUIDModel):
     season = models.CharField(
         max_length=2,
         choices=SEASONS,
+        editable=False,
     )
     year = models.PositiveSmallIntegerField(
         validators=[  # sanity check constraints
             MinValueValidator(2000),
             MaxValueValidator(3000),
         ],
+        editable=False,
     )
 
     # Automatically update the season and year upon save
@@ -167,11 +169,6 @@ class CourseNumber(UUIDModel):
 
 class Instructor(UUIDModel):
 
-    """
-    Represents an instructor.
-    """
-
-    # First and last name
     first_name = models.CharField(
         max_length=40
     )
@@ -237,20 +234,15 @@ class Course(UUIDModel):
         blank=True,
     )
 
-    description = models.TextField(
-        blank=True,
-    )
-    additional_info = models.TextField(
-        blank=True,
-    )
-    instructors = models.ManyToManyField(
-        Instructor,
-        related_name='courses',
-    )
+    instructors = models.ManyToManyField(Instructor,
+                                         related_name='courses')
 
-    last_updated = models.DateTimeField(
-        default=now,
-    )
+    description = models.TextField(blank=True)
+    additional_info = models.TextField(blank=True)
+
+    last_updated = models.DateTimeField(default=now)
+    details_scraped = models.BooleanField(default=False)
+    evals_scraped = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'%s (%s)' % (self.title, self.term)
