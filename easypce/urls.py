@@ -20,6 +20,7 @@ from django.views.generic import TemplateView
 from django.views import defaults as default_views
 
 urlpatterns = [
+    url(r'^api/', include('api.urls')),
     url(r'^$', TemplateView.as_view(template_name='index.html')),
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', admin.site.urls),

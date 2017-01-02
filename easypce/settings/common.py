@@ -51,6 +51,9 @@ THIRD_PARTY_APPS = (
     # Raven, for Sentry
     'raven.contrib.django.raven_compat',
 
+    # Crispy Forms
+    'crispy_forms',
+
     # Enable serving of webpack bundles
     'webpack_loader',
 
@@ -242,21 +245,37 @@ AUTH_PASSWORD_VALIDATORS = [
 # CELERY CONFIGURATION
 # ------------------------------------------------------------------------------
 
-# TODO: setup this configuration for production.
-INSTALLED_APPS += (
-    # 'easypce.celery.CeleryConfig',
-)
-
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://')
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
+CELERY_IGNORE_RESULT = True
+
 # Disable everything but JSON because we really don't need it
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['msgpack']
+CELERY_TASK_SERIALIZER = 'msgpack'
+CELERY_RESULT_SERIALIZER = 'msgpack'
+
+# SENTRY CONFIGURATION
+# ------------------------------------------------------------------------------
+
+RAVEN_CONFIG = {
+    'dsn': env('RAVEN_DSN', default=''),
+    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
+}
 
 # ADMIN
 # ------------------------------------------------------------------------------
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
+
+# REST FRAMEWORK
+# ------------------------------------------------------------------------------
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.'
+                                'LimitOffsetPagination',
+    'PAGE_SIZE': 150,
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.'
+                                'DjangoFilterBackend',)
+}
