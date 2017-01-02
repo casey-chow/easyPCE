@@ -67,30 +67,21 @@ class InstructorSerializer(serializers.ModelSerializer):
         )
 
 
-class CourseSerializer(serializers.ModelSerializer):
+class MeetingSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = models.Course
+        model = models.Meeting
         fields = (
-            'course_id',
-            'title',
-            'term',
-            'primary_number',
-            'pdf',
-            'pdf_only',
-            'audit',
-            'dist_req',
-            'description',
-            'additional_info',
-            'instructors',
-            'last_updated',
-            'sections',
-            'evaluations',
-            'advice',
+            'start_time',
+            'end_time',
+            'days',
+            'location'
         )
 
 
 class SectionSerializer(serializers.ModelSerializer):
+
+    meetings = MeetingSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Section
@@ -102,18 +93,6 @@ class SectionSerializer(serializers.ModelSerializer):
             'enrollment',
             'capacity',
             'meetings',
-        )
-
-
-class MeetingSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Meeting
-        fields = (
-            'start_time',
-            'end_time',
-            'days',
-            'location'
         )
 
 
@@ -136,6 +115,33 @@ class AdviceSerializer(serializers.ModelSerializer):
         )
 
 
+class CourseSerializer(serializers.ModelSerializer):
+
+    sections = SectionSerializer(many=True, read_only=True)
+    evaluations = EvaluationSerializer(many=True, read_only=True)
+    advice = AdviceSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Course
+        fields = (
+            'course_id',
+            'title',
+            'term',
+            'primary_number',
+            'pdf',
+            'pdf_only',
+            'audit',
+            'dist_req',
+            'description',
+            'additional_info',
+            'instructors',
+            'last_updated',
+            'sections',
+            'evaluations',
+            'advice',
+        )
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -143,4 +149,3 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'netid',
         )
-

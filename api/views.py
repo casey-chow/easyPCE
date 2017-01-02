@@ -23,5 +23,5 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = models.Course.objects.all()
     serializer_class = serializers.CourseSerializer
-    lookup_field = 'course_id' # TODO: figure out how to require term AND course id
-
+    # TODO: figure out how to require term AND course id
+    lookup_field = 'course_id'
