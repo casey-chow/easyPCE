@@ -1,1 +1,2 @@
-web: gunicorn easypce.wsgi --log-file -
+web: gunicorn easypce.wsgi
+worker: celery worker --app easypce

@@ -1,0 +1,12 @@
+{
+    "extends": "airbnb",
+    "plugins": [
+        "react",
+        "jsx-a11y",
+        "import"
+    ],
+    "rules": {
+        "indent": [1, 4], // warning, and 4 spaces
+        "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
+    }
+}

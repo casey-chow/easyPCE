@@ -1,0 +1,13 @@
+{% load render_bundle from webpack_loader %}
+{% load raven %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>easyPCE</title>
+    </head>
+    <body>
+        <div id="container"></div>
+        {% render_bundle 'main' %}
+        <script>Raven.config('{% sentry_public_dsn %}').install()</script>
+    </body>
+</html>
