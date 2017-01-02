@@ -270,6 +270,17 @@ RAVEN_CONFIG = {
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
 
+# WEBPACK LOADER
+# ------------------------------------------------------------------------------
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'CACHE': False,
+        'STATS_FILE': str(ROOT('webpack-stats.json')),
+    }
+}
+
 # REST FRAMEWORK
 # ------------------------------------------------------------------------------
 
