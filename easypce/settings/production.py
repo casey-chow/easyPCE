@@ -163,6 +163,7 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 RAVEN_CONFIG.update({
     'environment': 'production',
+    'release': env('HEROKU_SLUG_COMMIT'),
 })
 
 # LOGGING CONFIGURATION

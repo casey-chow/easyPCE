@@ -261,7 +261,6 @@ CELERY_RESULT_SERIALIZER = 'msgpack'
 
 RAVEN_CONFIG = {
     'dsn': env('SENTRY_DSN', default=''),
-    'release': raven.fetch_git_sha(ROOT()),
     'environment': env('SENTRY_ENVIRONMENT', default='development'),
 }
 

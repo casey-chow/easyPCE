@@ -88,3 +88,7 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 # until the task returns
 
 # CELERY_ALWAYS_EAGER = True
+
+RAVEN_CONFIG.update({
+    'release': raven.fetch_git_sha(ROOT()),
+})
