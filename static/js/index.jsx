@@ -9,6 +9,7 @@ class BooksList extends React.Component {
         this.state = {
             data: [],
         };
+        this.loadBooksFromServer = this.loadBooksFromServer.bind(this);
     }
 
     componentDidMount() {
