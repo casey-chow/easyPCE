@@ -1,8 +1,12 @@
 import React from 'react';
-import { Link } from "react-router";
-import $ from 'jquery';
-import ReactDOM from 'react-dom';
+import { connect } from "react-redux";
+import { fetchCourses } from "../actions/coursesActions"
 
+@connect((store) => {
+  return {
+    courses: store.courses.courses,
+  };
+})
 export default class CourseView extends React.Component {
     constructor(props) {
         super(props);
@@ -10,48 +14,19 @@ export default class CourseView extends React.Component {
         this.state = {
             data: [],
         };
-        this.loadBooksFromServer = this.loadBooksFromServer.bind(this);
-        this.url = '/api/';
-        this.pollInterval=1000;
     }
 
-    componentDidMount() {
-        this.loadBooksFromServer();
-        setInterval(this.loadBooksFromServer, 
-                    this.pollInterval)
-    }
-
-    loadBooksFromServer() {
-        $.ajax({
-            url: this.url,
-            datatype: 'json',
-            cache: false,
-            success: (data) => {
-                this.setState({data: data});
-            },
-        });
-    }
-
-    getInitialState() {
-        return {data: []};
+    componentWillMount() {
+        this.props.dispatch(fetchCourses())
     }
 
     render() {
-        console.log("the current state is: ", this.state)
-        if (this.state.data) {
-            console.log('DATA!');
-            var bookNodes = this.state.data.map(function(book){
-                return <li> {book.title} </li>
-            });
-        }
-        return (
+        console.log("the current props are... ", this.props)
+        return ( 
             <div>
                 <h1>Hello React! This is a test.</h1>
                 <p>Test test test</p>
                 <p> Test again </p>
-                <ul>
-                    {bookNodes}
-                </ul>
             </div>
         )
     }
