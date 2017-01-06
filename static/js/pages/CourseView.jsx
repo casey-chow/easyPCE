@@ -47,6 +47,8 @@ class Layout extends React.Component {
         return (
             <div>
                 <h1>Hello React! This is a test.</h1>
+                <p>Test test test</p>
+                <p> Test again </p>
                 <ul>
                     {bookNodes}
                 </ul>
