@@ -143,3 +143,6 @@ webpack-stats.json
 webpack-stats-prod.json
 static/bundles/
 staticfiles/
+
+# .DS_Store files
+.DS_Store
