@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import $ from 'jquery';
 import ReactDOM from 'react-dom';
 
-class Layout extends React.Component {
+export default class CourseView extends React.Component {
     constructor(props) {
         super(props);
 
@@ -56,6 +56,3 @@ class Layout extends React.Component {
         )
     }
 }
-
-
-export default Layout;
