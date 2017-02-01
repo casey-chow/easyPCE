@@ -1,12 +1,13 @@
 import React from 'react';
 import { connect } from "react-redux";
-import { fetchCourses } from "../actions/coursesActions"
+import fetchCourses from "../actions/coursesActions"
 
 @connect((store) => {
   return {
     courses: store.courses.courses,
   };
 })
+
 export default class CourseView extends React.Component {
     constructor(props) {
         super(props);

@@ -1,5 +1,8 @@
 {
     "extends": "airbnb",
+    "env": {
+        "browser": true
+    },
     "plugins": [
         "react",
         "jsx-a11y",
@@ -7,6 +10,8 @@
     ],
     "rules": {
         "indent": [1, 4], // warning, and 4 spaces
+        "react/jsx-indent": [1, 4],
         "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
-    }
+    },
+    "parser": "babel-eslint"
 }
