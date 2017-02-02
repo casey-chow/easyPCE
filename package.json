@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack/production.config.js",
     "build-local": "webpack --config webpack/local.config.js --progress --colors",
-    "clean": "rm -rf assets; rm -rf static/bundles",
+    "clean": "rm -rf dist",
     "lint": "eslint static/src && sass-lint",
     "postinstall": "npm run build",
     "watch": "node server.js"
