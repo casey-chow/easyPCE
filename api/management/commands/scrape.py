@@ -32,13 +32,13 @@ class Command(BaseCommand):
 
         if options['meta'] or options['all']:
             task_q.append(celery.group([
-                tasks.scrape_terms.s(),
-                tasks.scrape_subjects.s(),
+                tasks.import_terms.s(),
+                tasks.import_subjects.s(),
             ]))
 
         if options['terms'] or options['all']:
             terms = options['terms'] if not options['all'] else all_terms()
-            task_q.append(celery.group([tasks.scrape_courses_in_term.s(t)
+            task_q.append(celery.group([tasks.import_courses_in_term.s(t)
                                         for t in terms]))
 
         celery.chain(task_q)()

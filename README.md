@@ -2,7 +2,7 @@
 
 A better course evaluation tool.
 
-## Installation and Running
+## Quick Start
 
 Make sure you have Python 2.7, pip, and PostgreSQL, and npm installed. Then, run:
 
@@ -19,6 +19,10 @@ To run the server:
 $ python manage.py runserver
 ```
 
+## Development
+
+### Development Tools
+
 If you intend to develop on the build, you may enjoy hot code reloading on the
 client side. To set this up, run:
 
@@ -28,7 +32,7 @@ $ python manage.py runserver
 ```
 
 Additionally, if you want scraping functionality to work, you'll need too
-set up Redis and Celery for task scheduling.
+install Redis and Celery for task scheduling. Then, you can run this:
 
 ```sh
 $ celery worker -A easypce -l info
@@ -40,10 +44,10 @@ You can also do lots of fun stuff with concurrency if you use [Celery multi]:
 [Celery multi]: http://docs.celeryproject.org/en/latest/reference/celery.bin.multi.html
 
 ```sh
-$ celery multi start num\_workers -A easypce -l info
+$ celery multi start num_workers -A easypce -l info
 ```
 
-## Folder Stucture
+### Folder Stucture
 
 This project uses a mostly custom folder structure as an almagamation of
 various starting templates, adapted for our specific purposes.
@@ -57,8 +61,12 @@ various starting templates, adapted for our specific purposes.
 | `static`          | Static assets, including client-side code
 | `webpack`         | Webpack configuration
 
-## NPM Tasks
+### Build Tasks
 
+- `celery worker -A easypce -l info`: Run a celery worker for the project.
+- `celery multi start num_workers -A easypce -l info`: Run a worker cluster for the project.
+- `python manage.py runserver`: Run a development server.
+- `python manage.py scrape [--all] [--meta] [--terms (terms)]`: Run scraping tasks on workers.
 - `npm run build`: Builds the client-side bundle for production use.
 - `npm run build-local`: Like above, but for local use.
 - `npm run clean`: Remove all generated files.
