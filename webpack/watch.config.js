@@ -17,7 +17,7 @@ config.entry = [
     'webpack/hot/only-dev-server',
 
     // app entry point
-    './static/js/index',
+    './static/src/index',
 ];
 
 config.devServer = {

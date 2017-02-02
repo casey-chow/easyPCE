@@ -9,7 +9,7 @@ module.exports = {
     devtool: 'cheap-module-eval-source-map',
 
     // the entry point for the client-side application
-    entry: './static/js/index',
+    entry: './static/src/index',
 
     output: {
         // where you want your compiled bundle to be stored
