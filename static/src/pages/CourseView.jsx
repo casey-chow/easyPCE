@@ -25,7 +25,7 @@ export default class CourseView extends React.Component {
         return (
             <div>
                 <h1>Hello React!!</h1>
-                <p>Test testing</p>
+                <p>Test testing!</p>
             </div>
         );
     }

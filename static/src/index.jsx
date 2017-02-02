@@ -3,7 +3,6 @@ import { AppContainer } from 'react-hot-loader';
 
 import ReactDOM from 'react-dom';
 
-import 'jquery';
 import 'bootstrap';
 
 import '../scss/application.scss';
@@ -24,7 +23,7 @@ render(App);
 
 // Hot Module Replacement API
 if (module.hot) {
-  module.hot.accept('./components/App', () => {
-    render(App)
-  });
+    module.hot.accept('./components/App', () => {
+        render(App);
+    });
 }

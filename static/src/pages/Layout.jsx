@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from "react-router";
+import { Link } from 'react-router';
 
-import Footer from "../components/layout/Footer";
-import Nav from "../components/layout/Nav";
+import Footer from '../components/layout/Footer';
+import Nav from '../components/layout/Nav';
 
 class Layout extends React.Component {
     render() {
@@ -11,7 +11,7 @@ class Layout extends React.Component {
         return (
             <div>
                 <div className="row">
-                <Nav/>
+                    <Nav />
                 </div>
                 <div className="row">
                     <div className="container mt">
@@ -19,10 +19,10 @@ class Layout extends React.Component {
                     </div>
                 </div>
                 <div className="row">
-                <Footer/>
+                    <Footer />
                 </div>
             </div>
-        )
+        );
     }
 }
 
