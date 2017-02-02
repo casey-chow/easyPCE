@@ -145,6 +145,20 @@ def scrape_courses(term='current', subject='all'):
 # REGISTRAR WEBSITE-BASED SCRAPERS
 #####################################################################
 
+#: Base URL for the course listing
+REGISTRAR_BASE_URL = 'https://registrar.princeton.edu/course-offerings/' \
+           'course_details.xml'
+
+#: Root ID for description section
+DESCRIPTION_ID = 'timetable'
+
+#: Starting node ID
+ADDL_INFO_START_ID = 'descr'
+
+#: Ending node text
+ADDL_INFO_END_CONTENTS = re.compile('Schedule/Classroom assignment:')
+
+
 def scrape_course_details(term, course_id):
     """
     Returns a dict of relevant information from the registrar,
@@ -223,7 +237,7 @@ def scrape_course_details(term, course_id):
             class_attrs = [attr.get_text().strip() for attr in class_attrs]
 
             class_dict = dict(zip(CLASSES_ATTR_NAMES, class_attrs))
-            class_dict.update(_parse_enrollment_str(class_dict['enrollment']))
+            class_dict.update(parse_enrollment_str(class_dict['enrollment']))
 
             classes.append(class_dict)
         return classes
@@ -285,7 +299,7 @@ def scrape_course_details(term, course_id):
         """
         return PROFESSOR_ID_REGEX.findall(str(soup))
 
-    soup = get_soup(BASE_URL, {
+    soup = get_soup(REGISTRAR_BASE_URL, {
         'term': term,
         'courseid': course_id,
     })
@@ -305,7 +319,7 @@ def scrape_course_details(term, course_id):
 
 
 #: Base URL for course evaluations page
-BASE_URL = 'https://reg-captiva.princeton.edu/chart/index.php'
+EVALUATION_BASE_URL = 'https://reg-captiva.princeton.edu/chart/index.php'
 
 
 def scrape_evals(term, course_id):
@@ -350,7 +364,7 @@ def scrape_evals(term, course_id):
         comments = tables[-1].find_all('td')
         return [c.get_text().strip() for c in comments]
 
-    soup = get_soup(BASE_URL, {
+    soup = get_soup(EVALUATION_BASE_URL, {
         'terminfo': term,
         'courseinfo': course_id,
     })
@@ -359,4 +373,3 @@ def scrape_evals(term, course_id):
     comments = get_eval_comments(soup)
 
     return stats, comments
-
