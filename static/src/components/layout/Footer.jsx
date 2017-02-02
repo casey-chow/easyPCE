@@ -10,7 +10,9 @@ export default class Footer extends React.Component {
                     <div className="col-lg-4">
                         <h4>About</h4>
                         <div className="hline-w"></div>
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                        <p>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        </p>
                     </div>
                     <div className="col-lg-4">
                         <h4>Social Links</h4>

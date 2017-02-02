@@ -8,16 +8,14 @@ import CourseView from '../pages/CourseView';
 
 import './App.scss';
 
-const App = () => {
-    return (
-        <Provider store={store}>
-            <Router history={browserHistory}>
-                <Route path="/" component={Layout}>
-                    <IndexRoute component={CourseView} />
-                </Route>
-            </Router>
-        </Provider>
-    )
-};
+const App = () => (
+    <Provider store={store}>
+        <Router history={browserHistory}>
+            <Route path="/" component={Layout}>
+                <IndexRoute component={CourseView} />
+            </Route>
+        </Router>
+    </Provider>
+);
 
 export default App;
