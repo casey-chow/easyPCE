@@ -4,7 +4,12 @@ Tasks to scrape the registrar for the API.
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task, group
 from celery.utils.log import get_task_logger
-from princeton_scrapers import registrar
+
+from .scrapers import scrape_term
+from .scrapers import scrape_subjects
+from .scrapers import scrape_courses
+from .scrapers import scrape_course_details
+from .scrapers import scrape_evals
 
 from .models import Term
 from .models import Subject
@@ -18,15 +23,13 @@ from .models import Advice
 logger = get_task_logger(__name__)
 
 
-# TODO: make a function that allows for incremental scraping so that
-# this worker isn't running forever
 @shared_task
-def scrape_terms():
+def import_terms():
     """
     Scrapes all terms and inserts them into the database. Returns the
     terms found.
     """
-    terms = registrar.terms.scrape()
+    terms = scrape_term()
 
     # Insert terms not already in the database
     for term_data in terms:
@@ -47,12 +50,12 @@ def scrape_terms():
 
 
 @shared_task
-def scrape_subjects():
+def import_subjects():
     """
     Scrapes all subjects from web feeds and inserts them into the database.
     Returns the subjects found.
     """
-    subjects = registrar.subjects.scrape()
+    subjects = scrape_subjects()
 
     # Insert subjects not already in the database
     for subject_data in subjects:
@@ -70,7 +73,7 @@ def scrape_subjects():
 
 
 @shared_task
-def scrape_courses_in_subject(term_code, subj_code):
+def import_courses_in_subject(term_code, subj_code):
     """
     Scrapes all courses from web feeds and inserts them into the database.
     Returns a list of the course ids found.
@@ -79,7 +82,7 @@ def scrape_courses_in_subject(term_code, subj_code):
     """
     subject = Subject.objects.get(code=subj_code)
     term = Term.objects.get(code=term_code)
-    courses = registrar.courses.scrape(term_code, subj_code)
+    courses = scrape_courses(term_code, subj_code)
     course_ids = []
 
     def import_crosslistings(xlists_data, course):
@@ -181,12 +184,12 @@ def scrape_courses_in_subject(term_code, subj_code):
         import_instructors(course_data['instructors'], course)
         import_sections(course_data['classes'], course)
 
-        scrape_details.delay(term_code, course.course_id)
-        scrape_evals.delay(term_code, course.course_id)
+        import_details.delay(term_code, course.course_id)
+        import_evals.delay(term_code, course.course_id)
 
 
 @shared_task(time_limit=30)
-def scrape_details(term_code, course_id):
+def import_details(term_code, course_id):
     """
     Supplements existing course information with details, if possible.
     Assumes that instructors are already in the DB.
@@ -195,7 +198,7 @@ def scrape_details(term_code, course_id):
                 % (course_id, term_code))
     course = Course.objects.get(term__code=int(term_code),
                                 course_id=course_id)
-    details = registrar.course_details.scrape(term_code, course_id)
+    details = scrape_course_details(term_code, course_id)
 
     course.additional_info = details['additional_info']
     course.pdf = details['enroll_params']['pdf']
@@ -212,7 +215,7 @@ def scrape_details(term_code, course_id):
 
 
 @shared_task(time_limit=30)
-def scrape_evals(term_code, course_id):
+def import_evals(term_code, course_id):
     """
     Delete and scrape all evaluations for a given course.
     """
@@ -220,7 +223,7 @@ def scrape_evals(term_code, course_id):
                 % (course_id, term_code))
     course = Course.objects.get(course_id=course_id,
                                 term__code=int(term_code))
-    stats, comments = registrar.evals.scrape(term_code, course_id)
+    stats, comments = scrape_evals(term_code, course_id)
 
     course.evaluations.all().delete()
     for question, response in stats.iteritems():
@@ -239,12 +242,12 @@ def scrape_evals(term_code, course_id):
 
 
 @shared_task
-def scrape_courses_in_term(term_code):
+def import_courses_in_term(term_code):
     """
     Scrapes all courses in the given term.
     TODO: Make this incremental.
     """
     subjects = [subject.code for subject in Subject.objects.all()]
-    tasks = [scrape_courses_in_subject.s(term_code, subject)
+    tasks = [import_courses_in_subject.s(term_code, subject)
              for subject in subjects]
     group(tasks)()

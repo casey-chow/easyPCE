@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from "react-redux";
-import { fetchCourses } from "../actions/coursesActions"
+import fetchCourses from "../actions/coursesActions"
 
 // decorator usage: http://stackoverflow.com/a/36554390
 @connect((store) => {
@@ -8,6 +8,7 @@ import { fetchCourses } from "../actions/coursesActions"
     courses: store.courses.courses,
   };
 })
+
 export default class CourseView extends React.Component {
     constructor(props) {
         super(props);
@@ -18,17 +19,15 @@ export default class CourseView extends React.Component {
     }
 
     componentWillMount() {
-        this.props.dispatch(fetchCourses())
+        this.props.dispatch(fetchCourses());
     }
 
     render() {
-        console.log("the current props are... ", this.props)
-        return ( 
+        return (
             <div>
-                <h1>Hello React! This is a test.</h1>
-                <p>Test test test</p>
-                <p> Test again </p>
+                <h1>Hello React!!</h1>
+                <p>Test testing</p>
             </div>
-        )
+        );
     }
 }

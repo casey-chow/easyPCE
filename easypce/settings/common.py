@@ -252,9 +252,9 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_IGNORE_RESULT = True
 
 # Disable everything but JSON because we really don't need it
-CELERY_ACCEPT_CONTENT = ['msgpack']
-CELERY_TASK_SERIALIZER = 'msgpack'
-CELERY_RESULT_SERIALIZER = 'msgpack'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 # SENTRY CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -275,7 +275,7 @@ ADMIN_URL = r'^admin/'
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
+        'BUNDLE_DIR_NAME': 'dist/',
         'CACHE': False,
         'STATS_FILE': str(ROOT('webpack-stats.json')),
     }

@@ -14,9 +14,9 @@ class Layout extends React.Component {
                 <Nav/>
                 </div>
                 <div className="row">
-                <div className="container mt">
-                    {this.props.children}
-                </div>
+                    <div className="container mt">
+                        {this.props.children}
+                    </div>
                 </div>
                 <div className="row">
                 <Footer/>

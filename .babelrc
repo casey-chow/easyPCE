@@ -1,11 +1,21 @@
 {
-    "sourceMaps": "both",
     "presets": [
-        "react",
-        "es2015"
+        ["es2015", {"modules": false}],
+        // webpack understands the native import syntax, and uses it for tree shaking
+
+        "stage-2",
+        // Specifies what level of language features to activate.
+        // Stage 2 is "draft", 4 is finished, 0 is strawman.
+        // See https://tc39.github.io/process-document/
+
+        "react"
+        // Transpile React components to JavaScript
     ],
     "plugins": [
-	    "transform-object-rest-spread",
-	    "transform-decorators-legacy",
-    ]
+        "react-hot-loader/babel",
+        // Enables React code to work with HMR.
+        "transform-object-rest-spread",
+        "transform-decorators-legacy"
+    ],
+    "sourceMaps": "both"
 }

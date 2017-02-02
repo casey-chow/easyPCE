@@ -18,7 +18,7 @@ export default class Nav extends React.Component {
         <div className="navbar-collapse collapse navbar-right">
           <ul className="nav navbar-nav">
             <li><a href="index.html">HOME</a></li>
-            <li><a href="about.html">ABOUT</a></li>
+            <li><a href="about.html">EEEEEK</a></li>
             <li><a href="contact.html">CONTACT</a></li>
             <li className="dropdown active">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">PAGES <b className="caret"></b></a>
