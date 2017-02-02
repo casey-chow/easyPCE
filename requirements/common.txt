@@ -53,6 +53,7 @@ django-cors-headers>=1.1.0
 
 # Scraping
 beautifulsoup4>=4.5.3
+html5lib>=0.999999999
 
 # Grapelli
 django-grappelli==2.9.1
