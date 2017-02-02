@@ -5,7 +5,9 @@ const BundleTracker = require('webpack-bundle-tracker');
 const config = require('./common.config.js');
 
 // export to dist directory during production
-config.output.path = path.resolve(__dirname, '../assets/dist');
+config.output.path = path.resolve(__dirname, '../dist');
+
+config.devtool = 'source-map';
 
 config.plugins = config.plugins.concat([
     new BundleTracker({ filename: './webpack-stats-prod.json' }),

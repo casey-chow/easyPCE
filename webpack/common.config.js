@@ -6,7 +6,7 @@ module.exports = {
     // the base directory (absolute path) for resolving the entry option
     context: path.dirname(__dirname),
 
-    devtool: 'inline-source-map',
+    devtool: 'cheap-module-eval-source-map',
 
     // the entry point for the client-side application
     entry: './static/js/index',
