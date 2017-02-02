@@ -1,0 +1,13 @@
+{
+  "name": "easyPCE",
+  "description": "A better course evaluation tool.",
+  "repository": "https://github.com/casey-chow/easyPCE",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    },
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
