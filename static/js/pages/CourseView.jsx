@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from "react-redux";
 import { fetchCourses } from "../actions/coursesActions"
 
+// decorator usage: http://stackoverflow.com/a/36554390
 @connect((store) => {
   return {
     courses: store.courses.courses,
