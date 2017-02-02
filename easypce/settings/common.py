@@ -275,7 +275,7 @@ ADMIN_URL = r'^admin/'
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
+        'BUNDLE_DIR_NAME': 'dist/',
         'CACHE': False,
         'STATS_FILE': str(ROOT('webpack-stats.json')),
     }

@@ -13,7 +13,7 @@ config.plugins = config.plugins.concat([
     // remove debugging code
     new webpack.DefinePlugin({
         'process.env': {
-            'NODE_ENV': JSON.stringify('production'),
+            NODE_ENV: JSON.stringify('production'),
         },
     }),
 
@@ -29,7 +29,7 @@ config.plugins = config.plugins.concat([
 config.module.loaders.push({
     test: /\.jsx?$/,
     exclude: /node_modules/,
-    loader: 'babel',
+    loader: 'babel-loader',
 });
 
 module.exports = config;
