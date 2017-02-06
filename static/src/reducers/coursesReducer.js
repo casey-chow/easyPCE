@@ -16,7 +16,9 @@ export default function reducer(state = {
             ...state,
             fetching: false,
             fetched: true,
-            courses: action.payload,
+            courses: action.payload.results,
+            next: action.payload.next,
+            previous: action.payload.previous,
         };
     }
     default: {

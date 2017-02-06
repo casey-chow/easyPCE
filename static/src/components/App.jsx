@@ -6,11 +6,10 @@ import Layout from '../pages/Layout';
 import store from '../store';
 import CourseView from '../pages/CourseView';
 
-import './App.scss';
-
+/*  Renders the application proper, including routes. */
 const App = () => (
     <Provider store={store}>
-        <Router history={browserHistory}>
+        <Router key={Math.random()} history={browserHistory}>
             <Route path="/" component={Layout}>
                 <IndexRoute component={CourseView} />
             </Route>

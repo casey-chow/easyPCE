@@ -1,0 +1,9 @@
+@import '../../../scss/variables';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap/mixins';
+
+.Footer {
+  background-color: $brand-primary;
+  color: $white;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+}
