@@ -19,6 +19,25 @@ To run the server:
 $ python manage.py runserver
 ```
 
+## Scraping the Registrar
+
+Scraping the registrar is pretty simple. Make sure that you have RabbitMQ and you have migrated the site.
+
+On a Mac with Homebrew set up:
+
+```sh
+$ brew install rabbitmq
+$ brew services start rabbitmq
+$ python manage.py migrate
+```
+
+Then, start the worker and assign it tasks:
+
+```sh
+$ celery multi start Jones -A easypce -l info
+$ python manage.py scrape --all
+```
+
 ## Development
 
 ### Development Tools
