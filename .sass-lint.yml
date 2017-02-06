@@ -9,6 +9,12 @@ files:
     - 'node_modules/**/*.*'
 
 rules:
+  # Allow a looser classname convention to allow for component namespaces.
+  class-name-format:
+    - 2
+    -
+      convention: ^[_\-A-Za-z]+$
+
   # Extends
   extends-before-mixins: 1
   extends-before-declarations: 1
@@ -72,7 +78,10 @@ rules:
   empty-args: 1
   hex-length: 1
   hex-notation: 1
-  indentation: 1
+  indentation:
+    - 1
+    - 
+      size: 2
   leading-zero: 1
   max-line-length: 0
   max-file-line-count: 0
