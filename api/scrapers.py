@@ -364,6 +364,17 @@ def scrape_evals(term, course_id):
         comments = tables[-1].find_all('td')
         return [c.get_text().strip() for c in comments]
 
+    def get_eval_course_title(soup):
+        return soup('table')[2].tbody.tr.td.b.get_text()
+
+    PROFESSOR_ID_REGEX = re.compile(r'instructor\.php\?eid=(\d+)')
+
+    def get_instructors(soup):
+        # Return IDs of Professors
+        nodes = soup('table')[2].tbody.tr.td.find_all('a')
+        return [PROFESSOR_ID_REGEX.findall(x['href'])[0]
+                for x in nodes]
+
     soup = get_soup(EVALUATION_BASE_URL, {
         'terminfo': term,
         'courseinfo': course_id,
@@ -371,5 +382,7 @@ def scrape_evals(term, course_id):
 
     stats = get_eval_stats(soup)
     comments = get_eval_comments(soup)
+    title = get_eval_course_title(soup)
+    instructors = get_instructors(soup)
 
-    return stats, comments
+    return stats, comments, title, instructors

@@ -75,9 +75,13 @@ class Term(UUIDModel):
 
     start_date = models.DateField(
         unique=True,
+        null=True,
+        blank=True,
     )
     end_date = models.DateField(
         unique=True,
+        null=True,
+        blank=True,
     )
 
     SEASONS = Choices(

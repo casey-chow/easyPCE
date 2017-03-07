@@ -22,6 +22,8 @@ class Command(BaseCommand):
                             help='scrape the term and subject meta')
         parser.add_argument('--terms', nargs='+', metavar='term',
                             help='scrape all the provided term codes')
+        parser.add_argument('--extra', action='store_true',
+                            help='attempt to scrape additional information')
         # TODO: incremental
 
     def handle(self, *args, **options):
@@ -40,6 +42,9 @@ class Command(BaseCommand):
             terms = options['terms'] if not options['all'] else all_terms()
             task_q.append(celery.group([tasks.import_courses_in_term.s(t)
                                         for t in terms]))
+
+        if options['extra'] or options['all']:
+            task_q.append(tasks.import_all_extra_evals.s())
 
         celery.chain(task_q)()
 

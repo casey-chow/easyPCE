@@ -4,7 +4,10 @@ Tasks to scrape the registrar for the API.
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task, group
 from celery.utils.log import get_task_logger
+from hashlib import md5
+import urllib
 
+from .scrapers import EVALUATION_BASE_URL
 from .scrapers import scrape_term
 from .scrapers import scrape_subjects
 from .scrapers import scrape_courses
@@ -223,7 +226,7 @@ def import_evals(term_code, course_id):
                 % (course_id, term_code))
     course = Course.objects.get(course_id=course_id,
                                 term__code=int(term_code))
-    stats, comments = scrape_evals(term_code, course_id)
+    stats, comments, title, instructors = scrape_evals(term_code, course_id)
 
     course.evaluations.all().delete()
     for question, response in stats.iteritems():
@@ -236,9 +239,84 @@ def import_evals(term_code, course_id):
     for comment in comments:
         course.advice.create(text=comment)
 
+    course.title = title
+
+    for instructor_id in instructors:
+        instructor = Instructor.objects.get(emplid=instructor_id)
+        course.instructors.add(instructor)
+
     course.evals_scraped = True
     course.save()
     logger.info('imported evals for %s in term %s' % (course_id, term_code))
+
+
+@shared_task(time_limit=30)
+def import_extra_evals(course_id):
+    """
+    Attempt to import even earlier available evaluations. To mitigate the
+    possibility of false positives in recognizing this data, we follow strict
+    parameters to validate the information given to us:
+
+    - Only terms that are already in the database are considered.
+    - Only evaluation pages where the page MD5 hash is not equal to the
+      previous term's MD5 hash are considered, to avoid duplicate data.
+
+    This found data is attached to sparse course data, where descriptions, etc.
+    are blank.
+    """
+    logger.info('attempting extra import of evals for %s' % course_id)
+
+    # TODO: there's gotta be a more efficient query than this
+    terms_with_course = [
+        term for term in Term.objects.only('code')
+        if Course.objects.filter(term__code=term.code,
+                                 course_id=course_id).exists()
+    ]
+
+    first_term = min(terms_with_course, key=lambda x: x.code)
+    first_offering = Course.objects.get(course_id=course_id,
+                                        term=first_term)
+
+    terms_to_consider = (Term.objects
+                         .filter(code__lt=first_term.code)
+                         .extra(order_by=['-code']))
+
+    last_md5 = ''
+    for term in terms_to_consider:
+        course_page = urllib.urlopen(EVALUATION_BASE_URL +
+                                     '?terminfo=%s&courseinfo=%s' %
+                                     (term.code, course_id))
+        curr_md5 = md5(course_page.read()).hexdigest()
+        logger.info('attemping extra course eval info import for term %d of %s'
+                    % (term.code, course_id))
+
+        if last_md5 != curr_md5:
+            course, created = Course.objects.get_or_create(
+                course_id=course_id,
+                term=term,
+                defaults={
+                    'term': term,
+                    'primary_number': first_offering.primary_number,
+                    'title': first_offering.title,
+                },
+            )
+            if created:
+                logger.info("created course with id %s", course)
+
+            import_evals.delay(term.code, course_id)
+            last_md5 = curr_md5
+
+
+@shared_task
+def import_all_extra_evals():
+    """
+    Imports all extra evaluations in all courses.
+    """
+    course_ids = [course['course_id'] for course
+                  in Course.objects.values('course_id').distinct()]
+
+    for course_id in course_ids:
+        import_extra_evals.delay(course_id)
 
 
 @shared_task
